@@ -17,7 +17,7 @@ cpu_sleep_asm:
     WFI
     .size	cpu_sleep_asm, . - cpu_sleep_asm
 
-    .section .xip_banned,"x"
+    .section .text.cpu_recover_asm,"x"
     .thumb
     .thumb_func
     .globl cpu_recover_asm

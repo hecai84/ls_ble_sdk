@@ -280,8 +280,8 @@ enum V33_RG_REG_TRIM2_FIELD
 {
     V33_RG_PD_AMIC_MASK = (int)0x2,
     V33_RG_PD_AMIC_POS = 1,
-    V33_RG_latch_gpio_MASK = (int)0x4,
-    V33_RG_latch_gpio_POS = 2,
+    V33_RG_LATCH_GPIO_MASK = (int)0x4,
+    V33_RG_LATCH_GPIO_POS = 2,
     V33_RG_PD_ADC12_MASK = (int)0x8,
     V33_RG_PD_ADC12_POS = 3,
     V33_RG_PD_GPIO_MASK = (int)0x10,
@@ -310,6 +310,8 @@ enum V33_RG_REG_TRIM3_FIELD
     V33_RG_LPLDO_TRIM_POS = 2,
     V33_RG_PD_TK_MASK = (int)0x40,
     V33_RG_PD_TK_POS = 6,
+    V33_RG_PD_LCD_MASK = (int)0x80,
+    V33_RG_PD_LCD_POS = 7,
 };
 
 enum V33_RG_REG_DCDC0_FIELD
