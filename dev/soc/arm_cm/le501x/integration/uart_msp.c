@@ -97,6 +97,40 @@ uint32_t CSI_UART_MSP_Init(void *inst,uint32_t idx)
     return reg_base;
 }
 
+static void uart1_msp_deinit()
+{
+    REG_FIELD_WR(RCC->APB2EN, RCC_UART1, 0);
+    __NVIC_DisableIRQ(UART1_IRQn);
+}
+
+static void uart2_msp_deinit()
+{
+    REG_FIELD_WR(RCC->APB1EN, RCC_UART2, 0);
+    __NVIC_DisableIRQ(UART2_IRQn);
+}
+
+static void uart3_msp_deinit()
+{
+    REG_FIELD_WR(RCC->APB1EN, RCC_UART3, 0);
+    __NVIC_DisableIRQ(UART3_IRQn);
+}
+
+void CSI_UART_MSP_DeInit(uint32_t idx)
+{
+    switch(idx)
+    {
+    case 0:
+        uart1_msp_deinit();
+    break;
+    case 1:
+        uart1_msp_deinit();
+    break;
+    case 2:
+        uart1_msp_deinit();
+    break;
+    }
+}
+
 void HAL_UART_MSP_Init(UART_HandleTypeDef *inst)
 {
     switch((uint32_t)inst->UARTX)
@@ -118,16 +152,13 @@ void HAL_UART_MSP_DeInit(UART_HandleTypeDef *inst)
     switch((uint32_t)inst->UARTX)
     {
     case (uint32_t)UART1:
-        REG_FIELD_WR(RCC->APB2EN, RCC_UART1, 0);
-        __NVIC_DisableIRQ(UART1_IRQn);
+        uart1_msp_deinit();
     break;
     case (uint32_t)UART2:
-        REG_FIELD_WR(RCC->APB1EN, RCC_UART2, 0);
-        __NVIC_DisableIRQ(UART2_IRQn);
+        uart2_msp_deinit();
     break;
     case (uint32_t)UART3:
-        REG_FIELD_WR(RCC->APB1EN, RCC_UART3, 0);
-        __NVIC_DisableIRQ(UART3_IRQn);
+        uart3_msp_deinit();
     break;
     }
 }

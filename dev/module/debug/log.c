@@ -80,7 +80,7 @@ int fputc(int ch, FILE *f)
 }
 
 #elif defined(__GNUC__)
-
+#ifndef CONFIG_AOS
 int _write (int fd, char *ptr, int len)
 {
     #if(LOG_BACKEND&JLINK_RTT)
@@ -100,7 +100,7 @@ int _write (int fd, char *ptr, int len)
     #endif
     return len;
 }
-
+#endif
 #endif
 
 void log_output(bool linefeed,const char *format,...)

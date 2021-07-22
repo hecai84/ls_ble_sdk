@@ -16,6 +16,8 @@
 #include "lsrtc.h"
 #include "systick.h"
 #include "reg_lsgpio.h"
+static uint32_t CPU_PSP;
+static uint8_t CPU_CONTROL;
 bool waiting_ble_wkup_irq;
 static uint8_t wkup_stat;
 void cpu_sleep_asm(void);
@@ -335,4 +337,17 @@ void LPWKUP_Handler(void)
 void BLE_WKUP_IRQ_DISABLE()
 {
     __NVIC_DisableIRQ(BLE_WKUP_IRQn);
+}
+
+XIP_BANNED uint64_t store_psp_return_msp_and_addr()
+{
+    CPU_CONTROL = __get_CONTROL();
+    CPU_PSP = __get_PSP();
+    return __get_MSP();
+}
+
+XIP_BANNED void restore_psp()
+{
+    __set_PSP(CPU_PSP);
+    __set_CONTROL(CPU_CONTROL);
 }

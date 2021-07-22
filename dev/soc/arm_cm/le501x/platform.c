@@ -116,7 +116,7 @@ static uint32_t flash_data_storage_base_offset()
 void irq_reinit()
 {
     irq_priority();
-    NVIC->ISER[0] = 1<<LPWKUP_IRQn|1<<EXTI_IRQn;
+    NVIC->ISER[0] = 1<<CACHE_IRQn|1<<LPWKUP_IRQn|1<<EXTI_IRQn;
 }
 
 static void irq_init()
@@ -375,7 +375,9 @@ void sys_init_ll()
     analog_init();
     ll_var_init();
     io_init();
+    rco_freq_counting_init();
     LOG_INIT();
+    HAL_PIS_Init();
     lsecc_init();
     calc_acc_init();
     cpu_sleep_recover_init();
@@ -383,6 +385,8 @@ void sys_init_ll()
     modem_rf_init();
     irq_init();
     systick_start();
+    rco_freq_counting_config();
+    rco_freq_counting_start();
 }
 
 void platform_reset(uint32_t error)
@@ -602,4 +606,14 @@ __attribute__((weak)) uint64_t __aeabi_uidivmod(uint32_t r0,uint32_t r1)
 __attribute__((weak)) int64_t __aeabi_idivmod(int32_t r0,int32_t r1)
 {
     return (int64_t)idiv_acc(r0,r1,true);
+}
+
+void aos_swint_init(void (*isr)())
+{
+    arm_cm_set_int_isr(CACHE_IRQn,isr);
+}
+
+void aos_swint_set()
+{
+    __NVIC_SetPendingIRQ(CACHE_IRQn);
 }
