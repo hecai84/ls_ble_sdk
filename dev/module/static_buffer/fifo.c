@@ -41,7 +41,13 @@ ROM_SYMBOL LL_PKT_ISR bool dword_fifo_put(struct fifo_env *ptr,void *data)
     {
         uint64_t *elem = ptr->buf;
         elem[GET_WR_IDX(ptr)] = *(uint64_t *)data;
-        ptr->wr_idx = (ptr->wr_idx + 1)%(2*ptr->length);
+        if(ptr->wr_idx + 1 == 2*ptr->length)
+        {
+            ptr->wr_idx = 0;
+        }else
+        {
+            ptr->wr_idx = ptr->wr_idx + 1;
+        }
         return true;
     }
 }
@@ -55,7 +61,13 @@ ROM_SYMBOL bool dword_fifo_get(struct fifo_env *ptr,void *data)
     {
         uint64_t *elem = ptr->buf;
         *(uint64_t *)data = elem[GET_RD_IDX(ptr)];
-        ptr->rd_idx = (ptr->rd_idx + 1)%(2*ptr->length);
+        if(ptr->rd_idx + 1 == 2*ptr->length)
+        {
+            ptr->rd_idx = 0;
+        }else
+        {
+            ptr->rd_idx = ptr->rd_idx + 1;
+        }
         return true;
     }
 }
