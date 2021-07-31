@@ -310,6 +310,7 @@ static bool node_crc_check(uint8_t type,uint16_t section,uint16_t offset,uint8_t
     uint8_t payload_length = node_metadata_length[type];
     uint16_t calc_crc = crc16calc(TINYFS_CRC_INIT_VAL,buf,payload_length);
     uint16_t origin_crc;
+    bool tail = section == tinyfs_env.tail_section;
     if(type==RECORD_ADD)
     {
         record_add_t *ptr = (record_add_t *)buf;
@@ -319,8 +320,14 @@ static bool node_crc_check(uint8_t type,uint16_t section,uint16_t offset,uint8_t
     {
         section_offset_calc(&section,&offset,payload_length);
     }
-    nvm_read_node(section,offset,TINYFS_CRC_LENGTH,(uint8_t *)&origin_crc);
-    return calc_crc == origin_crc;
+    if(tail && section == tinyfs_env.tail_section || (tail == false && offset <= TINYFS_SECTION_SIZE - TINYFS_CRC_LENGTH))
+    {
+        nvm_read_node(section,offset,TINYFS_CRC_LENGTH,(uint8_t *)&origin_crc);
+        return calc_crc == origin_crc;
+    }else
+    {
+        return false;
+    }
 }
 
 static bool node_metadata_read(uint16_t section, uint16_t offset, uint8_t *buf)
