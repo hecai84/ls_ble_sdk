@@ -335,7 +335,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--c99 -O2</MiscControls>
-              <Define></Define>
+              <Define>LE501X</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\module\crc;..\..\..\..\module\debug;..\..\..\..\module\debug\RTT;..\..\..\..\module\static_buffer;..\..\..\..\module\tinyfs;..\..\..\..\module\tinycrypt\lib\include;..\..\..\..\module\ble;..\..\..\..\module\ble\prf;..\..\..\..\module\ble\ll;..\..\..\..\module\common;..\..\..\..\module\adpcm;..\..\..\..\peripheral\ecc;..\..\..\..\peripheral\api;..\..\..\..\peripheral\inc;..\..\..\..\soc\arm_cm;..\..\..\..\soc\arm_cm\cmsis;..\..\..\..\soc\arm_cm\le501x;..\..\..\..\soc\arm_cm\le501x\integration;..\..\..\..\soc;..\..\..\..;..;</IncludePath>
             </VariousControls>

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include "log.h"
 #include "sw_timer.h"
+#include "sleep.h"
 #define TIMER0_PERIOD_MS 50
 #define TIMER1_PERIOD_MS 70
 struct sw_timer_env timer[2];

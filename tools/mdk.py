@@ -43,7 +43,7 @@ def mdk_builder(target,source,env):
     scat_file_str = os.path.relpath((env['LINKSCRIPT']).srcnode().abspath, prj_dir)
     prj.ScatterFile = scat_file_str
     
-    prj.CDefines = "" 
+    prj.CDefines = " ".join(env['CPPDEFINES']).replace('-D','')
     prj.COptions = "--c99 -O2 " 
     prj.LinkOptions = " --datacompressor=off --diag_suppress=L6314,L6329 "
     beforecompile1 = mdk_xml_schema.UserAction('')

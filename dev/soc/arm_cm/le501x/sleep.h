@@ -65,6 +65,8 @@ void dcdc_off(void);
 
 void deep_sleep(void);
 
+void deep_sleep_no_ble(void);
+
 void ble_sleep(void);
 
 void enter_deep_sleep_mode_lvl2_lvl3(struct deep_sleep_wakeup *wakeup);
