@@ -26,13 +26,7 @@ static bool insertion_compare(struct cdll_hdr *ptr,struct cdll_hdr *ref_hdr)
 {
     struct sw_timer_env *insert = CONTAINER_OF(ptr,struct sw_timer_env,hdr);
     struct sw_timer_env *ref = CONTAINER_OF(ref_hdr,struct sw_timer_env,hdr);
-    if(timer_time_compare(insert->target,ref->target)>=0)
-    {
-        return true;
-    }else
-    {
-        return false;
-    }
+    return timer_time_compare(insert->target,ref->target)>=0;
 }
 
 void sw_timer_update()

@@ -320,7 +320,7 @@ static bool node_crc_check(uint8_t type,uint16_t section,uint16_t offset,uint8_t
     {
         section_offset_calc(&section,&offset,payload_length);
     }
-    if(tail && section == tinyfs_env.tail_section || (tail == false && offset <= TINYFS_SECTION_SIZE - TINYFS_CRC_LENGTH))
+    if((tail && section == tinyfs_env.tail_section) || (tail == false && offset <= TINYFS_SECTION_SIZE - TINYFS_CRC_LENGTH))
     {
         nvm_read_node(section,offset,TINYFS_CRC_LENGTH,(uint8_t *)&origin_crc);
         return calc_crc == origin_crc;

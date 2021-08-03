@@ -74,7 +74,8 @@
         "reg_sysc_ble_type.h": "c",
         "lscache_msp.h": "c",
         "ll_port.h": "c",
-        "reg_v33_rg.h": "c"
+        "reg_v33_rg.h": "c",
+        "calc_div.h": "c"
     },
     "editor.detectIndentation": false,
     "restructuredtext.confPath": "${workspaceFolder}\\doc",

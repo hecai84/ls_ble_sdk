@@ -140,7 +140,7 @@ static bool wkup_sleep_interval_enough(sw_timer_time_t time,uint16_t cnt)
 {
     int diff_time = timer_time_compare(time,wkup_time);
     int16_t diff_cnt = cnt-wkup_cnt;
-    if(diff_time * 625 + diff_cnt > 65)
+    if(diff_time * 625 + diff_cnt > 100)
     {
         return true;
     }else

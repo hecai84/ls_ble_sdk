@@ -102,6 +102,7 @@ ROM_SYMBOL void cdll_insert(struct cdll *list,struct cdll_hdr *hdr,bool (*cmp)(s
 			hdr->next = ptr->next;
 			hdr->prev = ptr;
 			ptr->next = hdr;
+			ptr = ptr->next;
 			break;
 		}else
 		{
