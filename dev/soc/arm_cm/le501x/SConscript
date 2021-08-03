@@ -27,6 +27,7 @@ src = [
     'integration/lscrypt_msp.c',
     'sleep.c',
     'sys_stat.c',
+    'sw_timer_port.c',
 ]
 inc = [
     '.',

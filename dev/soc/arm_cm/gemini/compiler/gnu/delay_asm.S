@@ -5,7 +5,8 @@
     .section .text.arm_cm_delay_asm,"x"
 #else
     .section .xip_banned,"x"
-#endif    .thumb
+#endif    
+    .thumb
     .thumb_func
     .align 1
     .globl arm_cm_delay_asm

@@ -28,6 +28,7 @@
 #include "lspis.h"
 #include "lstimer.h"
 #include "reg_lptim.h"
+#include "sw_timer.h"
 #define ISR_VECTOR_ADDR ((uint32_t *)(0x0))
 #define APP_IMAGE_BASE_OFFSET (0x24)
 #define FOTA_IMAGE_BASE_OFFSET (0x28)
@@ -42,6 +43,8 @@ void stack_var_ptr_init(void);
 void main_task_app_init(void);
 
 void main_task_itf_init(void);
+
+void mac_init_for_sw_timer(void);
 
 __attribute__((weak)) void builtin_timer_env_register(linked_buffer_t *env){}
 
@@ -142,13 +145,12 @@ static void mac_init()
     {
         mac_clk = 0; //AHB 16M
     }
-//    RCC->CK |= RCC_LSE_EN_MASK;
-//    while(REG_FIELD_RD(RCC->CK,RCC_LSE_RDY)==0);
     RCC->BLECFG = mac_clk<<RCC_BLE_CK_SEL_POS| 1<<RCC_BLE_MRST_POS | 1<<RCC_BLE_CRYPT_RST_POS | 1<<RCC_BLE_LCK_RST_POS | 1<<RCC_BLE_AHB_RST_POS | 1<<RCC_BLE_WKUP_RST_POS
-        | 1<<RCC_BLE_LPWR_CKEN_POS | 1<<RCC_BLE_AHBEN_POS | 1<<RCC_BLE_MDM_REFCLK_CKEN_POS;// | 1<<RCC_BLE_LCK_SEL_POS;
+        | 1<<RCC_BLE_LPWR_CKEN_POS | 1<<RCC_BLE_AHBEN_POS | 1<<RCC_BLE_MDM_REFCLK_CKEN_POS | !SDK_LSI_USED<<RCC_BLE_LCK_SEL_POS;
     RCC->BLECFG &= ~(1<<RCC_BLE_MRST_POS | 1<<RCC_BLE_CRYPT_RST_POS | 1<<RCC_BLE_LCK_RST_POS | 1<<RCC_BLE_AHB_RST_POS | 1<<RCC_BLE_WKUP_RST_POS);
 }
 
+#if SDK_LSI_USED
 static uint16_t lsi_cnt_val;
 static uint16_t lsi_dummy_cnt;
 #define LSI_CNT_CYCLES (100)
@@ -165,6 +167,7 @@ void rco_freq_counting_init()
     REG_FIELD_WR(RCC->APB2EN,RCC_LPTIM,1);
     REG_FIELD_WR(RCC->APB1EN,RCC_GPTIMB1,1);
     arm_cm_set_int_isr(GPTIMB1_IRQn,GPTIM_IRQ_Handler_For_LSI_Counting);
+    DELAY_US(200);
 }
 
 void rco_freq_counting_config()
@@ -195,7 +198,6 @@ void rco_freq_counting_start()
     LPTIM->CON1 |= 4;
 }
 
-
 uint32_t lpcycles_to_hus(uint32_t lpcycles)
 {
     uint32_t hus = 2*lpcycles*lsi_cnt_val/LSI_CNT_CYCLES;
@@ -205,6 +207,7 @@ uint32_t lpcycles_to_hus(uint32_t lpcycles)
 
 uint32_t lsi_freq_update_and_hs_to_lpcycles(int32_t hs_cnt)
 {
+    LS_ASSERT(hs_cnt);
     LS_ASSERT((NVIC->ISER[0U]&1<<GPTIMB1_IRQn)==0);
     uint16_t ccr = LSGPTIMB->CCR1;
     if(ccr!=lsi_dummy_cnt)
@@ -212,10 +215,34 @@ uint32_t lsi_freq_update_and_hs_to_lpcycles(int32_t hs_cnt)
         lsi_cnt_val = ccr;
         //LOG_I("%d,%d",lsi_cnt_val,lsi_dummy_cnt);
     }
+    LS_ASSERT(lsi_cnt_val);
     uint32_t lpcycles = LSI_CNT_CYCLES*625*hs_cnt/2/lsi_cnt_val;
     //LOG_I("%d,%d,%d",lsi_cnt_val,lpcycles,hs_cnt);
-    return lpcycles - 1;
+    return lpcycles;
 }
+
+void rco_freq_counting_sync()
+{
+    while((NVIC->ISER[0U]&1<<GPTIMB1_IRQn));
+    while(LSGPTIMB->CCR1==lsi_dummy_cnt);
+    lsi_cnt_val = LSGPTIMB->CCR1;
+}
+
+void lse_init(){}
+#else
+void rco_freq_counting_init(){}
+void rco_freq_counting_config(){}
+void rco_freq_counting_start(){}
+uint32_t lpcycles_to_hus(uint32_t lpcycles){return 0;}
+uint32_t lsi_freq_update_and_hs_to_lpcycles(int32_t hs_cnt){return 0;}
+void rco_freq_counting_sync(){}
+void lse_init()
+{
+    REG_FIELD_WR(SYSCFG->PMU_TRIM,SYSCFG_LDO_LP_TRIM,7);
+    RCC->CK |= RCC_LSE_EN_MASK;
+    DELAY_US(100000);
+}
+#endif
 
 uint8_t get_reset_source()
 {
@@ -291,7 +318,7 @@ static void analog_init()
     {
         clk_switch();
     }
-
+    lse_init();
     REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_OSCRC_DIG_PWR_EN,0);
     //REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_ADC12B_DIG_PWR_EN, 0);
     REG_FIELD_WR(SYSCFG->PMU_TRIM, SYSCFG_XTAL_STBTIME, XTAL_STB_VAL);
@@ -325,13 +352,21 @@ void sys_init_app()
 void sys_init_none()
 {
     analog_init();
+    rco_freq_counting_init();
+    HAL_PIS_Init();
     spi_flash_drv_var_init(true,false);
     cpu_sleep_recover_init();
     calc_acc_init();
     mac_init();
     io_init();
+    irq_init();
     systick_start();
     LOG_INIT();
+    rco_freq_counting_config();
+    rco_freq_counting_start();
+    mac_init_for_sw_timer();
+    sw_timer_module_init();
+    rco_freq_counting_sync();
 }
 
 void sys_init_24g(void)
@@ -400,13 +435,8 @@ void platform_reset(uint32_t error)
 
 uint64_t idiv_acc(uint32_t dividend,uint32_t divisor,bool signed_int)
 {
-    uint64_t retval;
-    struct {
-        uint32_t r0;
-        uint32_t r1;
-    }*ret_ptr = (void *)&retval;
     uint32_t cpu_stat = enter_critical();
-    calc_div(dividend, divisor, signed_int,&ret_ptr->r0,&ret_ptr->r1);
+    uint64_t retval = calc_div(dividend, divisor, signed_int);
     exit_critical(cpu_stat);
     return retval;
 }

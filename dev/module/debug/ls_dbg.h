@@ -7,8 +7,8 @@
 #include <stdbool.h>
 
 #ifdef NDEBUG
-#define LS_ASSERT(e) 
-#define LS_RAM_ASSERT(e) 
+#define LS_ASSERT(e) (void)(e)
+#define LS_RAM_ASSERT(e) (void)(e)
 #else
 #if ROM_CODE == 1 
 #if defined(BOOT_ROM)

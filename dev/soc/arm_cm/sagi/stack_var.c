@@ -121,7 +121,7 @@ void stack_var_ptr_init()
     ll_free_fn = free;
     io_set_pin_fn = io_set_pin;
     io_clr_pin_fn = io_clr_pin;
-    ble_hclk2lpclk_fn = ble_hclk2lpclk;
+    //ble_hclk2lpclk_fn = ble_hclk2lpclk;
     ble_lpclk2hclk_fn = ble_lpclk2hclk;
 
     

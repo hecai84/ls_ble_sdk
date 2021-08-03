@@ -294,12 +294,14 @@ void deep_sleep()
     rco_freq_counting_start();
 }
 
+bool timer_sleep(void);
 void deep_sleep_no_ble()
 {
     uint32_t cpu_stat = enter_critical();
-    NVIC->ICER[0] = ~(1<<LPWKUP_IRQn);
-    cpu_flash_deep_sleep_and_recover();
-    irq_reinit();
+    if(timer_sleep())
+    {
+        deep_sleep();
+    }
     exit_critical(cpu_stat);
 }
 

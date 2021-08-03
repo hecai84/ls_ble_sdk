@@ -10,13 +10,12 @@
       <TargetName>ARMCM0</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060750::V5.06 update 6 (build 750)::ARMCC</pCCUsed>
       <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>ARMCM0</Device>
           <Vendor>ARM</Vendor>
-          <PackID>ARM.CMSIS.5.7.0</PackID>
+          <PackID>ARM.CMSIS.5.6.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IROM(0x00000000,0x00040000) CPUTYPE("Cortex-M0") CLOCK(12000000) ESEL ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -184,6 +183,7 @@
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>0</RvdsVP>
+            <RvdsMve>0</RvdsMve>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -337,7 +337,7 @@
               <MiscControls>--c99 -O2</MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\module\crc;..\..\..\..\module\debug;..\..\..\..\module\debug\RTT;..\..\..\..\module\static_buffer;..\..\..\..\module\tinyfs;..\..\..\..\module\tinycrypt\lib\include;..\..\..\..\module\ble;..\..\..\..\module\ble\prf;..\..\..\..\module\ble\ll;..\..\..\..\module\common;..\..\..\..\module\adpcm;..\..\..\..\peripheral\ecc;..\..\..\..\peripheral\api;..\..\..\..\peripheral\inc;..\..\..\..\soc\arm_cm;..\..\..\..\soc\arm_cm\cmsis;..\..\..\..\soc\arm_cm\le501x;..\..\..\..\soc\arm_cm\le501x\integration;..\..\..\..\soc;..\..\..\..;..</IncludePath>
+              <IncludePath>..\..\..\..\module\crc;..\..\..\..\module\debug;..\..\..\..\module\debug\RTT;..\..\..\..\module\static_buffer;..\..\..\..\module\tinyfs;..\..\..\..\module\tinycrypt\lib\include;..\..\..\..\module\ble;..\..\..\..\module\ble\prf;..\..\..\..\module\ble\ll;..\..\..\..\module\common;..\..\..\..\module\adpcm;..\..\..\..\peripheral\ecc;..\..\..\..\peripheral\api;..\..\..\..\peripheral\inc;..\..\..\..\soc\arm_cm;..\..\..\..\soc\arm_cm\cmsis;..\..\..\..\soc\arm_cm\le501x;..\..\..\..\soc\arm_cm\le501x\integration;..\..\..\..\soc;..\..\..\..;..;</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -355,7 +355,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\module\crc;..\..\..\..\module\debug;..\..\..\..\module\debug\RTT;..\..\..\..\module\static_buffer;..\..\..\..\module\tinyfs;..\..\..\..\module\tinycrypt\lib\include;..\..\..\..\module\ble;..\..\..\..\module\ble\prf;..\..\..\..\module\ble\ll;..\..\..\..\module\common;..\..\..\..\module\adpcm;..\..\..\..\peripheral\ecc;..\..\..\..\peripheral\api;..\..\..\..\peripheral\inc;..\..\..\..\soc\arm_cm;..\..\..\..\soc\arm_cm\cmsis;..\..\..\..\soc\arm_cm\le501x;..\..\..\..\soc\arm_cm\le501x\integration;..\..\..\..\soc;..\..\..\..;..</IncludePath>
+              <IncludePath>..\..\..\..\module\crc;..\..\..\..\module\debug;..\..\..\..\module\debug\RTT;..\..\..\..\module\static_buffer;..\..\..\..\module\tinyfs;..\..\..\..\module\tinycrypt\lib\include;..\..\..\..\module\ble;..\..\..\..\module\ble\prf;..\..\..\..\module\ble\ll;..\..\..\..\module\common;..\..\..\..\module\adpcm;..\..\..\..\peripheral\ecc;..\..\..\..\peripheral\api;..\..\..\..\peripheral\inc;..\..\..\..\soc\arm_cm;..\..\..\..\soc\arm_cm\cmsis;..\..\..\..\soc\arm_cm\le501x;..\..\..\..\soc\arm_cm\le501x\integration;..\..\..\..\soc;..\..\..\..;..;</IncludePath>
             </VariousControls>
           </Aads>
           <LDads>
@@ -480,6 +480,11 @@
               <FileName>sha256.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\module\tinycrypt\lib\source\sha256.c</FilePath>
+            </File>
+            <File>
+              <FileName>sw_timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\module\common\sw_timer.c</FilePath>
             </File>
             <File>
               <FileName>tinyfs.c</FileName>
@@ -772,6 +777,11 @@
               <FilePath>..\..\..\..\soc\arm_cm\le501x\compiler\armcc\svcall_asm.S</FilePath>
             </File>
             <File>
+              <FileName>sw_timer_port.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\soc\arm_cm\le501x\sw_timer_port.c</FilePath>
+            </File>
+            <File>
               <FileName>swint_handler.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\soc\arm_cm\swint_handler.c</FilePath>
@@ -801,11 +811,5 @@
       </Groups>
     </Target>
   </Targets>
-
-  <RTE>
-    <apis/>
-    <components/>
-    <files/>
-  </RTE>
 
 </Project>

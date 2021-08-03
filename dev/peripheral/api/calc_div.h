@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-void calc_div(uint32_t dividend,uint32_t divisor,bool signed_div,uint32_t *quotient,uint32_t *remainder);
+uint64_t calc_div(uint32_t dividend,uint32_t divisor,bool signed_div);
 
 #endif
 

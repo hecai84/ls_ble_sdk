@@ -334,3 +334,7 @@ uint32_t get_app_image_base()
     return config_word_get(APP_IMAGE_BASE_OFFSET);
 }
 
+void idle_process()
+{
+
+}

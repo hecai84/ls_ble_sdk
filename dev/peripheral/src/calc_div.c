@@ -5,13 +5,12 @@
 
 #define CALC ((reg_calc_t *)CALC_BASE_ADDR)
 
-void calc_div(uint32_t dividend,uint32_t divisor,bool signed_div,uint32_t *quotient,uint32_t *remainder)
+uint64_t calc_div(uint32_t dividend,uint32_t divisor,bool signed_div)
 {
     CALC->DIVCSR = FIELD_BUILD(CALC_DIV_SIGN,signed_div?1:0) | FIELD_BUILD(CALC_DIV_TRM,0);
     CALC->DIVS = divisor;
     CALC->DIVD = dividend;
     while(REG_FIELD_RD(CALC->DIVCSR,CALC_DIV_BUSY));
-    *quotient = CALC->DIVQ;
-    *remainder = CALC->DIVR;
+    return (uint64_t)CALC->DIVR<<32 | CALC->DIVQ;
 }
 
