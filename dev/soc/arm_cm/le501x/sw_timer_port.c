@@ -18,8 +18,10 @@
 #define TIME_CORR2 (*(volatile uint32_t *)0x50000044)
 #define CLK_TARGET (*(volatile uint32_t *)0x500000f0)
 #define CLK_SAMP (*(volatile uint32_t *)0x500000f8)
+#define CNT_SAMP (*(volatile uint32_t *)0x500000fc)
 static void (*timer_isr)();
-
+static sw_timer_time_t wkup_time;
+static uint16_t wkup_cnt;
 sw_timer_time_t timer_time_add(sw_timer_time_t a,sw_timer_time_t b)
 {
     return (a + b) & 0xfffffff;
@@ -83,7 +85,6 @@ static void WKUP_Handler_For_SW_Timer()
     BLE_WKUP_IRQ_DISABLE();
 }
 
-sw_timer_time_t wkup_current;
 static void Handler_For_SW_Timer()
 {
     static uint32_t error = 0;
@@ -117,7 +118,8 @@ static void Handler_For_SW_Timer()
     {
         INT_CLR = 0x1;
         INT_MASK &= ~0x1;
-        wkup_current = timer_time_get();
+        wkup_time = timer_time_get();
+        wkup_cnt = 624 - CNT_SAMP;
         timer_isr();
     }
 }
@@ -134,15 +136,27 @@ void mac_init_for_sw_timer()
     INT_CLR = 0xffffffff;
 }
 
-sw_timer_time_t sleep_target;
-sw_timer_time_t sleep_current;
-bool timer_sleep()
+static bool wkup_sleep_interval_enough(sw_timer_time_t time,uint16_t cnt)
 {
-    if(ble_wkup_status_get()||INT_MASK&0x1)
+    int diff_time = timer_time_compare(time,wkup_time);
+    int16_t diff_cnt = cnt-wkup_cnt;
+    if(diff_time * 625 + diff_cnt > 65)
+    {
+        return true;
+    }else
     {
         return false;
     }
+}
+
+bool timer_sleep()
+{
     sw_timer_time_t current = timer_time_get();
+    uint16_t cnt = 624 - CNT_SAMP;
+    if(ble_wkup_status_get()||wkup_sleep_interval_enough(current,cnt)==false||INT_MASK&0x1)
+    {
+        return false;
+    }
     struct sw_timer_env *timer = sw_timer_list_pick();
     if(timer)
     {
@@ -151,8 +165,6 @@ bool timer_sleep()
         {
             return false;
         }
-        sleep_current = current;
-        sleep_target = timer->target;
         if(SDK_LSI_USED)
         {
             SLEEP_TIME = lsi_freq_update_and_hs_to_lpcycles(sleep_time) - 1;
