@@ -208,12 +208,14 @@ uint32_t lpcycles_to_hus(uint32_t lpcycles)
 uint32_t lsi_freq_update_and_hs_to_lpcycles(int32_t hs_cnt)
 {
     LS_ASSERT(hs_cnt);
-    LS_ASSERT((NVIC->ISER[0U]&1<<GPTIMB1_IRQn)==0);
-    uint16_t ccr = LSGPTIMB->CCR1;
-    if(ccr!=lsi_dummy_cnt)
+    if((NVIC->ISER[0U]&1<<GPTIMB1_IRQn)==0)
     {
-        lsi_cnt_val = ccr;
-        //LOG_I("%d,%d",lsi_cnt_val,lsi_dummy_cnt);
+        uint16_t ccr = LSGPTIMB->CCR1;
+        if(ccr!=lsi_dummy_cnt)
+        {
+            lsi_cnt_val = ccr;
+            //LOG_I("%d,%d",lsi_cnt_val,lsi_dummy_cnt);
+        }
     }
     LS_ASSERT(lsi_cnt_val);
     uint32_t lpcycles = LSI_CNT_CYCLES*625*hs_cnt/2/lsi_cnt_val;
@@ -295,15 +297,16 @@ static void module_init()
     srand(get_trng_value());
     calc_acc_init();
     cpu_sleep_recover_init();
-    uint32_t base_offset = flash_data_storage_base_offset();
-    tinyfs_init(base_offset);
-    tinyfs_print_dir_tree();
     mac_init();
     modem_rf_init();
     irq_init();
     systick_start();
     rco_freq_counting_config();
     rco_freq_counting_start();
+    uint32_t base_offset = flash_data_storage_base_offset();
+    tinyfs_init(base_offset);
+    tinyfs_print_dir_tree();
+    rco_freq_counting_sync();
 }
 
 static void rco_val_init()
