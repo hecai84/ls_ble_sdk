@@ -2,9 +2,7 @@
 #define SLEEP_H_
 #include <stdint.h>
 #include <stdbool.h>
-#define XTAL_STB_VAL (0x20)
-#define XTAL_STARTUP_CYCLES (XTAL_STB_VAL + 4)
-
+extern const uint16_t wkup_delay_us;
 #define NORMAL_SLEEP           0x01
 #define SLEEP_MODE0            0x00
 #define SLEEP_MODE1            0x02

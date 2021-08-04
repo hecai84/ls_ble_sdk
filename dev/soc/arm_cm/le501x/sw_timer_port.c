@@ -5,7 +5,6 @@
 #include "sleep.h"
 #include "sdk_config.h"
 #define SLEEP_MINIMUM_HS_CYCLES 10
-#define WKUP_IN_ADVANCE_LPCYCLES 90
 #define CNTL (*(volatile uint32_t *)0x50000000)
 #define INT_MASK (*(volatile uint32_t *)0x50000018)
 #define INT_STAT (*(volatile uint32_t *)0x5000001c)
@@ -173,7 +172,8 @@ bool timer_sleep()
             SLEEP_TIME = (sleep_time << 10)/100 - 1;
         }
     }
-    WKUP_CNTL = 1<<21 | WKUP_IN_ADVANCE_LPCYCLES<<10 | 1;
+    uint16_t cycles = SDK_LSI_USED ? us_to_lpcycles(wkup_delay_us) : 32768*wkup_delay_us/1000000;
+    WKUP_CNTL = 1<<21 | cycles<<10 | 1;
     SLEEP_CNTL |= 0x7;
     return true;
 }

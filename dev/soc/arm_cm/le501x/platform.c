@@ -29,6 +29,7 @@
 #include "lstimer.h"
 #include "reg_lptim.h"
 #include "sw_timer.h"
+#define XTAL_STB_VAL 20
 #define ISR_VECTOR_ADDR ((uint32_t *)(0x0))
 #define APP_IMAGE_BASE_OFFSET (0x24)
 #define FOTA_IMAGE_BASE_OFFSET (0x28)
@@ -205,6 +206,11 @@ uint32_t lpcycles_to_hus(uint32_t lpcycles)
     return hus;
 }
 
+uint32_t us_to_lpcycles(uint32_t us)
+{
+    return us*LSI_CNT_CYCLES/lsi_cnt_val;
+}
+
 uint32_t lsi_freq_update_and_hs_to_lpcycles(int32_t hs_cnt)
 {
     LS_ASSERT(hs_cnt);
@@ -236,6 +242,7 @@ void rco_freq_counting_init(){}
 void rco_freq_counting_config(){}
 void rco_freq_counting_start(){}
 uint32_t lpcycles_to_hus(uint32_t lpcycles){return 0;}
+uint32_t us_to_lpcycles(uint32_t us){return 0;}
 uint32_t lsi_freq_update_and_hs_to_lpcycles(int32_t hs_cnt){return 0;}
 void rco_freq_counting_sync(){}
 void lse_init()
@@ -323,7 +330,6 @@ static void analog_init()
     }
     lse_init();
     REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_OSCRC_DIG_PWR_EN,0);
-    //REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_ADC12B_DIG_PWR_EN, 0);
     REG_FIELD_WR(SYSCFG->PMU_TRIM, SYSCFG_XTAL_STBTIME, XTAL_STB_VAL);
     rco_val_init();
 }

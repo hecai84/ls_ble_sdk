@@ -29,6 +29,7 @@ __attribute((weak)) void (*exit_critical_fn)(uint32_t);
 __attribute((weak)) uint32_t (*enter_critical_fn)(void);
 __attribute((weak)) void (*stack_reset_hook_fn)(void);
 __attribute((weak)) uint32_t (*lpcycles_to_hus_fn)(uint32_t);
+__attribute((weak)) uint32_t (*us_to_lpcycles_fn)(uint32_t);
 __attribute((weak)) uint32_t (*lsi_freq_update_and_hs_to_lpcycles_fn)(int32_t);
 __attribute((weak)) bool lsi_used;
 
@@ -134,6 +135,7 @@ void stack_var_ptr_init()
     exit_critical_fn = exit_critical;
     stack_reset_hook_fn = NULL;
     lpcycles_to_hus_fn = lpcycles_to_hus;
+    us_to_lpcycles_fn = us_to_lpcycles;
     lsi_freq_update_and_hs_to_lpcycles_fn = lsi_freq_update_and_hs_to_lpcycles;
     #if SDK_LSI_USED
     lsi_used = true;

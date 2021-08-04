@@ -16,6 +16,7 @@
 #include "lsrtc.h"
 #include "systick.h"
 #include "reg_lsgpio.h"
+const uint16_t wkup_delay_us = 1500;
 static uint32_t CPU_PSP;
 static uint8_t CPU_CONTROL;
 bool waiting_ble_wkup_irq;
@@ -79,8 +80,6 @@ XIP_BANNED void before_wfi()
     ble_hclk_clr();
     switch_to_xo16m();
     SYSCFG->ANACFG0 &= ~(SYSCFG_EN_DPLL_MASK | SYSCFG_EN_DPLL_16M_RF_MASK | SYSCFG_EN_DPLL_128M_RF_MASK | SYSCFG_EN_DPLL_128M_EXT_MASK | SYSCFG_EN_QCLK_MASK);
-    MODIFY_REG(SYSCFG->ANACFG1,SYSCFG_XO16M_ADJ_MASK | SYSCFG_XO16M_LP_MASK,
-        (uint32_t)3<<SYSCFG_XO16M_ADJ_POS | (uint32_t)0<<SYSCFG_XO16M_LP_POS);
 }
 
 XIP_BANNED static void wait_dpll_lock()
@@ -93,7 +92,7 @@ XIP_BANNED static void wait_dpll_lock()
 
             break;
         }
-        if(i>10)
+        if(i>40)
         {
             break;
         }
@@ -118,10 +117,7 @@ XIP_BANNED void after_wfi()
     {
         while(1);
     }
-    DELAY_US(200);
     dcdc_on();
-    MODIFY_REG(SYSCFG->ANACFG1,SYSCFG_XO16M_ADJ_MASK | SYSCFG_XO16M_LP_MASK,
-        0<<SYSCFG_XO16M_ADJ_POS | 1<<SYSCFG_XO16M_LP_POS);
     SYSCFG->ANACFG0 |= (SYSCFG_EN_DPLL_MASK | SYSCFG_EN_DPLL_16M_RF_MASK | SYSCFG_EN_DPLL_128M_RF_MASK | SYSCFG_EN_DPLL_128M_EXT_MASK | SYSCFG_EN_QCLK_MASK);
     wait_dpll_lock();
     clk_switch();

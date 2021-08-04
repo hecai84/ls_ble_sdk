@@ -66,6 +66,8 @@ void rco_freq_counting_start(void);
 
 uint32_t lpcycles_to_hus(uint32_t lpcycles);
 
+uint32_t us_to_lpcycles(uint32_t us);
+
 uint32_t lsi_freq_update_and_hs_to_lpcycles(int32_t hs_cnt);
 
 uint64_t idiv_acc(uint32_t,uint32_t,bool);
