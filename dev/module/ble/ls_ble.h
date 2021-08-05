@@ -136,7 +136,7 @@ struct legacy_adv_obj_param
   */
 enum phy_type
 {
-    PHY_TYPE_1M = 0,                               /*!< LE 1Mbps phy*/ 
+    PHY_TYPE_1M = 1,                               /*!< LE 1Mbps phy*/ 
     PHY_TYPE_2M,                                   /*!< LE 2Mbps phy*/ 
     PHY_TYPE_CODED,                                /*!< LE Coded phy*/ 
 };
