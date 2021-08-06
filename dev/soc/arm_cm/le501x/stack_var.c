@@ -8,7 +8,7 @@
 #define ENV_BUF_SIZE 2048
 #if CONFIG_AOS
 #define DB_BUF_SIZE 0
-#define MSG_BUF_SIZE 2304
+#define MSG_BUF_SIZE 2132
 #define NON_RET_BUF_SIZE (12)
 #else
 #define DB_BUF_SIZE 8192
@@ -85,6 +85,21 @@ struct
     uint32_t env[2];
 }llcp_tx_buf[(2*SDK_MAX_ACT_NUM)];
 
+
+struct{
+    uint32_t env[2];
+}acl_tx_buf[(SDK_MAX_ACT_NUM + 2)];
+
+#if CONFIG_AOS
+struct 
+{
+    uint32_t env[2];
+}rx_buf[5]; 
+
+struct{
+    uint32_t env[2];
+}adv_tx_buf[2];
+#else
 struct 
 {
     uint32_t env[2];
@@ -92,11 +107,8 @@ struct
 
 struct{
     uint32_t env[2];
-}acl_tx_buf[(SDK_MAX_ACT_NUM + 2)];
-
-struct{
-    uint32_t env[2];
 }adv_tx_buf[6];
+#endif
 
 struct 
 {
