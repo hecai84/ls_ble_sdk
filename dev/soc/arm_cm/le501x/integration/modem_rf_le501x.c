@@ -20,7 +20,6 @@ struct {
             ldo_rx_trim:3;
 }rf_ret;
 
-
 // Power table
 static const int8_t RF_TX_PW_CONV_TBL[RF_PWR_TBL_SIZE] =
 {
@@ -137,16 +136,16 @@ static void rf_reg_init()
                | FIELD_BUILD(RF_TX_RATE,0)
                | FIELD_BUILD(RF_CF_BW08M_ADJ,0)
                | FIELD_BUILD(RF_TX_DATA_TST_EN,0)
-               | FIELD_BUILD(RF_PA_VCAS_RES_ADJ,0)  
+               | FIELD_BUILD(RF_PA_VCAS_RES_ADJ,0)
                | FIELD_BUILD(RF_PA_GAIN,0xf)
                | FIELD_BUILD(RF_PA_TANK_Q_ADJ,0)
-               | FIELD_BUILD(RF_EN_PA_IBX2,1);  
-    RF->REG0C = FIELD_BUILD(RF_PA_TANK_TUNE,1)  
+               | FIELD_BUILD(RF_EN_PA_IBX2,1);
+    RF->REG0C = FIELD_BUILD(RF_PA_TANK_TUNE,1)
                | FIELD_BUILD(RF_EN_RSSI_Q,1)
                | FIELD_BUILD(RF_EN_RSSI_I,1)
-               | FIELD_BUILD(RF_PA_VB1_ADJ,0xf)  
-               | FIELD_BUILD(RF_PA_VB2_ADJ,0xf)  
-               | FIELD_BUILD(RF_PA_PTAT_ADJ,0)  
+               | FIELD_BUILD(RF_PA_VB1_ADJ,0xf)
+               | FIELD_BUILD(RF_PA_VB2_ADJ,0xf)
+               | FIELD_BUILD(RF_PA_PTAT_ADJ,0)
                | FIELD_BUILD(RF_EN_PA_IPTAT,1)
                | FIELD_BUILD(RF_PA_BG_ADJ,4)
                | FIELD_BUILD(RF_EN_PA_IBG,1)
@@ -231,7 +230,7 @@ static void rf_reg_init()
                | FIELD_BUILD(RF_PLL_PS_CNT_RST_SEL,0)
                | FIELD_BUILD(RF_AGC_TEST_S,0)
                | FIELD_BUILD(RF_PA_MN_TUNE,0)
-               | FIELD_BUILD(RF_PLL_GAIN_CAL_TH,0x22)
+               | FIELD_BUILD(RF_PLL_GAIN_CAL_TH,0x22) //0x22
                | FIELD_BUILD(RF_PLL_VTXD_EXT,pll_int_vtxd_ext)
                | FIELD_BUILD(RF_PLL_VTXD_EXT_EN,0)
                | FIELD_BUILD(RF_PLL_GAIN_CAL_EN,0)
@@ -253,7 +252,7 @@ static void rf_reg_init()
                | FIELD_BUILD(RF_PLL_TEST_EN,0)
                | FIELD_BUILD(RF_CH_SEL,1)
                | FIELD_BUILD(RF_PA_VB_SEL,0)  //  0-rf_ctl      1-cs_ctl
-               | FIELD_BUILD(RF_PA_VB_TARGET,0xf)
+               | FIELD_BUILD(RF_PA_VB_TARGET,0xf) 
                | FIELD_BUILD(RF_LDO_START_CNT,3)
                | FIELD_BUILD(RF_PA_STEP_SET,5);
     RF->REG54 = FIELD_BUILD(RF_AFC_MIN_CNT,24)
@@ -278,18 +277,24 @@ static void rf_reg_init()
                | FIELD_BUILD(RF_INT_VTXD_EXT2,pll_int_vtxd_ext)
                | FIELD_BUILD(RF_INT_VTXD_EXT1,pll_int_vtxd_ext);
 
+
        switch (package_id)
        {
            case 0x1603:
            REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_XO16M_CAP_TRIM, 0x7);
            REG_FIELD_WR(RF->REG2C, RF_PLL_GAIN_CAL_TH, 0x25);
            REG_FIELD_WR(RF->REG50, RF_PA_STEP_SET, 0x2);
+           REG_FIELD_WR(RF->REG0C,RF_PA_TANK_TUNE,7);
+           REG_FIELD_WR(RF->REG0C,RF_PA_VB1_ADJ,0x0);
            break;
            case 0x3202:
            case 0x4803:
            REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_XO16M_CAP_TRIM, 0x9);
+           REG_FIELD_WR(RF->REG08,RF_PA_VCAS_RES_ADJ,0); 
+           REG_FIELD_WR(RF->REG0C,RF_PA_VB1_ADJ,0xf);
            REG_FIELD_WR(RF->REG2C,RF_PLL_GAIN_CAL_TH,0x22);
-           REG_FIELD_WR(RF->REG50,RF_PA_STEP_SET,0x4); 
+           REG_FIELD_WR(RF->REG50,RF_PA_STEP_SET,0x3); //0x0f
+           REG_FIELD_WR(RF->REG0C,RF_PA_TANK_TUNE,1);
            break;
            default:
            break;
@@ -361,21 +366,24 @@ static void rf_reg_retention()
 
 void rf_set_power(uint8_t tx_power)
 {
-    if(tx_power==7 || tx_power==0xB )
+
+    if(tx_power == 0x10)
     {
-        REG_FIELD_WR(RF->REG00,RF_EN_PAHP,1);
         REG_FIELD_WR(RF->REG30,RF_PAHP_SEL,1);
         REG_FIELD_WR(RF->REG30,RF_LDO_PAHP_TRIM,0xf);
-        REG_FIELD_WR(RF->REG30,RF_LDO_PA_TRIM,7);
+        REG_FIELD_WR(RF->REG50,RF_PA_STEP_SET,0x3); //0x0f
+        REG_FIELD_WR(RF->REG2C,RF_PA_MN_TUNE,0xa);
+        REG_FIELD_WR(RF->REG00,RF_EN_PAHP,1);
     }
-    else{
+    else if(tx_power < 0x10)
+    {
         REG_FIELD_WR(RF->REG00,RF_EN_PAHP,0);
         REG_FIELD_WR(RF->REG30,RF_PAHP_SEL,0);
         REG_FIELD_WR(RF->REG30,RF_LDO_PAHP_TRIM,0);
-        REG_FIELD_WR(RF->REG30,RF_LDO_PA_TRIM,3);
+        REG_FIELD_WR(RF->REG2C,RF_PA_MN_TUNE,3);
+        REG_FIELD_WR(RF->REG50,RF_PA_STEP_SET,(((15-tx_power)<=3)?3:(((15-tx_power)<=8)?5:10))); //0x0f
+        REG_FIELD_WR(RF->REG50,RF_PA_VB_TARGET,tx_power);
     }
-
-    REG_FIELD_WR(RF->REG50,RF_PA_VB_TARGET,tx_power);
 }
 
 void modem_rf_reinit()
@@ -392,7 +400,6 @@ void modem_rf_init()
     modem_rf_reinit();
     pll_cal_testreg_init();
     BPF_CAL();
-    // pll_gain();
     pll_cal_testreg_deinit();
 }
 
