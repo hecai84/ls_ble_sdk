@@ -403,7 +403,7 @@ void io_cfg_pushpull(uint8_t pin)
 {
     gpio_pin_t *x = (gpio_pin_t *)&pin;
     reg_lsgpio_t *gpiox = GPIO_GetPort(x->port);
-    gpiox->OT |= 0<< x->num;
+    gpiox->OT &= ~(1<< x->num);
 }
 
 void uart1_7816_io_init(uint8_t txd,uint8_t ck)

@@ -259,7 +259,7 @@ enum V33_RG_REG_PWR_CTRL_FIELD
 
 enum V33_RG_REG_EXTI_CTRL0_FIELD
 {
-    V33_RG_GPIO_INTR_MSK_MASK = (int)0xffffffff,
+    V33_RG_GPIO_INTR_MSK_MASK = (int)0xffff,
     V33_RG_GPIO_INTR_MSK_POS = 0,
 };
 

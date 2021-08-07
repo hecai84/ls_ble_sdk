@@ -15,7 +15,7 @@ void cpu_recover_asm(void);
 void xo16m(void);
 void cpu_sleep_recover_init()
 {
-    V33_RG->SFT_CTRL03 = (uint32_t)cpu_recover_asm >> 1;
+    V33_RG->SFT_CTRL03 =(((uint32_t)cpu_recover_asm)>>1)<<24; 
 }
 
 XIP_BANNED void xo16m()
@@ -50,7 +50,6 @@ XIP_BANNED void after_wfi()
 
 XIP_BANNED void power_down_config()
 {
-    V33_RG->SFT_CTRL03 =(((uint32_t)cpu_recover_asm)>>1)<<24; 
     V33_RG->PWR_CTRL = FIELD_BUILD(V33_RG_LPLDO_PD_EN,0)
                           |FIELD_BUILD(V33_RG_HPLDO_PD_EN,1)
                           |FIELD_BUILD(V33_RG_MSI_PD_EN,1)
@@ -93,6 +92,7 @@ NOINLINE XIP_BANNED static void cpu_flash_deep_sleep_and_recover()
 {
     spi_flash_xip_stop();
     spi_flash_deep_power_down();
+    cpu_sleep_recover_init();
     power_down_config();
     cpu_sleep_asm();
     SCB->CCR |= SCB_CCR_UNALIGN_TRP_Msk;

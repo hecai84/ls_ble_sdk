@@ -7,6 +7,7 @@
 #include "reg_v33_rg_type.h"
 #include "reg_sysc_per_type.h"
 #include "reg_sysc_awo_type.h"
+#include "reg_lsexti_type.h"
 #include "ls_dbg.h"
 
 gpio_pin_t uart1_txd;
@@ -18,28 +19,108 @@ __attribute__((weak)) void io_exti_callback(uint8_t pin){}
 
 void EXTI_Handler(void)
 {
-    uint8_t port,i,pin;
+    uint8_t i,pin;
     uint32_t int_stat = V33_RG->GPIO_INTR;
-    for(i=0;i<16;i++)
+    for(i=0;i<7;i++)
     {
         if ((1<<i) & int_stat)
         {
             V33_RG->EXTI_CTRL2 = 1<<i;
             V33_RG->EXTI_CTRL2 = 0;
-            port = (V33_RG->GPIO_SEL>>(2*i)) & 0x03;
-            pin = (port<<4) | i;
-            io_exti_callback(pin);
+            switch(i)
+            {
+              case 0:
+              pin=PA00;
+              break;
+              case 1:
+              pin=PA01;
+              break;
+              case 2:
+              pin=PA02;
+              break;
+              case 3:
+              pin=PC00;
+              break;
+              case 4:
+              pin=PC01;
+              break;
+              case 5:
+              pin=PC02;
+              break;
+              case 6:
+              pin=PC03;
+              break;
+              case 7:
+              pin=PC13;
+              break;
+            }
         }
     }
-    for(i=16;i<32;i++)
+    for(i=8;i<15;i++)
     {
         if ((1<<i) & int_stat)
         {
             V33_RG->EXTI_CTRL2 = 1<<i;
             V33_RG->EXTI_CTRL2 = 0;
-            port = (V33_RG->GPIO_SEL>>(2*(i-16))) & 0x03;  //
-            pin = (port<<4) | (i-16);
-            io_exti_callback(pin);
+            switch(i)
+            {
+              case 8:
+              pin=PA00;
+              break;
+              case 9:
+              pin=PA01;
+              break;
+              case 10:
+              pin=PA02;
+              break;
+              case 11:
+              pin=PC00;
+              break;
+              case 12:
+              pin=PC01;
+              break;
+              case 13:
+              pin=PC02;
+              break;
+              case 14:
+              pin=PC03;
+              break;
+              case 15:
+              pin=PC13;
+              break;
+            }
+        }
+    }
+    io_exti_callback(pin);
+}
+
+static void exti_io_handler(uint8_t port,uint8_t num)
+{
+    uint8_t pin = port<<4 | num;
+    EXTI->EICR = 1<<num;
+    io_exti_callback(pin);
+}
+
+
+void GPIO_Handler(void)
+{
+    uint16_t int_stat = EXTI->EEIFM;
+    uint8_t i;
+    uint8_t port;
+    for(i=0;i<8;++i)
+    {
+        if(1<<i & int_stat)
+        {
+            port = EXTI->EICFG0 >> (4*i);
+            exti_io_handler(port,i);
+        }
+    }
+    for(i=8;i<16;++i)
+    {
+        if(1<<i & int_stat)
+        {
+            port = EXTI->EICFG1 >> (4*(i-8));
+            exti_io_handler(port,i);
         }
     }
 }
@@ -56,6 +137,8 @@ void io_init(void)
     SYSC_AWO->IO[3].OE_DOT = 0;
     arm_cm_set_int_isr(EXT_IRQn,EXTI_Handler);
     __NVIC_EnableIRQ(EXT_IRQn);
+    arm_cm_set_int_isr(GPIO_IRQn,GPIO_Handler);
+    __NVIC_EnableIRQ(GPIO_IRQn);
 }
 
 
@@ -150,16 +233,123 @@ io_pull_type_t io_pull_read(uint8_t pin)
 void io_exti_config(uint8_t pin,exti_edge_t edge)
 {
     gpio_pin_t *x = (gpio_pin_t *)&pin;
-    V33_RG->GPIO_SEL = x->port << (x->num*2);
-    V33_RG->EXTI_CTRL2 = 1<<x->num | 1<<(x->num+16);
-    V33_RG->EXTI_CTRL2 = 0;
+    if(x->num <= 7)
+    {
+        MODIFY_REG(EXTI->EICFG0, 0xf<< 4 * x->num,x->port << 4 * x->num);
+    }else
+    {
+        MODIFY_REG(EXTI->EICFG1, 0xf<< 4 * (x->num - 8),x->port << 4 * (x->num - 8));
+    }
     if(edge == INT_EDGE_FALLING)
     {
-        V33_RG->EXTI_CTRL0 =  1 << (x->num+16);
-    }
-    else
+        switch(pin)
+        {
+        case PA00:
+            V33_RG->EXTI_CTRL2 =0X100;
+            V33_RG->EXTI_CTRL2 =0;
+            V33_RG->EXTI_CTRL0 |= 0x100;
+            V33_RG->GPIO_SEL &= ~(0x01);
+        break;
+        case PA01:
+            V33_RG->EXTI_CTRL2 =0X200;
+            V33_RG->EXTI_CTRL2 =0;
+            V33_RG->EXTI_CTRL0 |= 0x200;
+            V33_RG->GPIO_SEL &= ~(0x02);
+        break;
+        case PA02:
+            V33_RG->EXTI_CTRL2 =0X400;
+            V33_RG->EXTI_CTRL2 =0;
+            V33_RG->EXTI_CTRL0 |= 0x400;
+            V33_RG->GPIO_SEL &= ~(0x04);
+        break;
+        case PC00:
+            V33_RG->EXTI_CTRL2 =0X800;
+            V33_RG->EXTI_CTRL2 =0;
+            V33_RG->EXTI_CTRL0 |= 0x800;
+            V33_RG->GPIO_SEL &= ~(0x08);
+        break;
+        case PC01:
+            V33_RG->EXTI_CTRL2 =0X1000;
+            V33_RG->EXTI_CTRL2 =0;
+            V33_RG->EXTI_CTRL0 |= 0x1000;
+            V33_RG->GPIO_SEL |= 0X01;
+        break;
+        case PC02:
+            V33_RG->EXTI_CTRL2 =0X2000;
+            V33_RG->EXTI_CTRL2 =0;
+            V33_RG->EXTI_CTRL0 |= 0x2000;
+            V33_RG->GPIO_SEL |= 0X02;
+        break;
+        case PC03:
+            V33_RG->EXTI_CTRL2 =0X4000;
+            V33_RG->EXTI_CTRL2 =0;
+            V33_RG->EXTI_CTRL0 |= 0x4000;
+            V33_RG->GPIO_SEL |= 0X04;
+        break;
+        case PC13:
+            V33_RG->EXTI_CTRL2 =0X8000;
+            V33_RG->EXTI_CTRL2 =0;
+            V33_RG->EXTI_CTRL0 |= 0x8000;
+            V33_RG->GPIO_SEL |= 0X08;
+        break;
+        }
+        EXTI->ERTS &= ~(1 << x->num);
+        EXTI->EFTS |= 1 << x->num;
+    }else
     {
-        V33_RG->EXTI_CTRL0 = 1 << x->num;
+        switch(pin)
+        {
+        case PA00:
+            V33_RG->EXTI_CTRL2 =0X1;
+            V33_RG->EXTI_CTRL2 =0;
+            V33_RG->EXTI_CTRL0 |= 0x01;
+            V33_RG->GPIO_SEL &= ~(0x10);
+        break;
+        case PA01:
+            V33_RG->EXTI_CTRL2 =0X2;
+            V33_RG->EXTI_CTRL2 =0;
+            V33_RG->EXTI_CTRL0 |= 0x02;
+            V33_RG->GPIO_SEL &= ~(0x20);
+        break;
+        case PA02:
+            V33_RG->EXTI_CTRL2 =0X4;
+            V33_RG->EXTI_CTRL2 =0;
+            V33_RG->EXTI_CTRL0 |= 0x04;
+            V33_RG->GPIO_SEL &= ~(0x40);
+        break;
+        case PC00:
+            V33_RG->EXTI_CTRL2 =0X8;
+            V33_RG->EXTI_CTRL2 =0;
+            V33_RG->EXTI_CTRL0 |= 0x08;
+            V33_RG->GPIO_SEL &= ~(0x80);
+        break;
+        case PC01:
+            V33_RG->EXTI_CTRL2 =0X10;
+            V33_RG->EXTI_CTRL2 =0;
+            V33_RG->EXTI_CTRL0 |= 0x10;
+            V33_RG->GPIO_SEL &= ~(0x10);
+        break;
+        case PC02:
+            V33_RG->EXTI_CTRL2 =0X20;
+            V33_RG->EXTI_CTRL2 =0;
+            V33_RG->EXTI_CTRL0 |= 0x20;
+            V33_RG->GPIO_SEL &= ~(0x20);
+        break;
+        case PC03:
+            V33_RG->EXTI_CTRL2 =0X40;
+            V33_RG->EXTI_CTRL2 =0;
+            V33_RG->EXTI_CTRL0 |= 0x40;
+            V33_RG->GPIO_SEL &= ~(0x40);
+        break;
+        case PC13:
+            V33_RG->EXTI_CTRL2 =0X80;
+            V33_RG->EXTI_CTRL2 =0;
+            V33_RG->EXTI_CTRL0 |= 0x80;
+            V33_RG->GPIO_SEL &= ~(0x80);
+        break;
+        }
+        EXTI->EFTS &= ~(1 << x->num);
+        EXTI->ERTS |= 1 << x->num;
     }
 }
 
