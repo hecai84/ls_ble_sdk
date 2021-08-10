@@ -18,6 +18,8 @@ extern const unsigned char one_bits[];
 
 #define MIN(a,b) ((a)<(b)?(a):(b))
 
+#define MAX(a,b) ((a)>(b)?(a):(b))
+
 #define CEILING(dividend,divisor) ((dividend)/(divisor) + (((dividend)%(divisor))?1:0))
 
 void *ll_malloc(uint32_t size);
