@@ -16,3 +16,4 @@ PERIPHERAL API
     lsiwdg
     lstimer
     lspis
+    lsadc

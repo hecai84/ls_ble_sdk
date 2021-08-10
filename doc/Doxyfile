@@ -15,6 +15,7 @@ INPUT                  = ../dev/peripheral/api/spi_flash.h \
                          ../dev/peripheral/api/lstimer.h \
                          ../dev/module/ble/prf/prf_hid.h \
                          ../dev/peripheral/api/lspis.h \
+                         ../dev/peripheral/api/lsadc.h \
 
 GENERATE_XML           = YES
 

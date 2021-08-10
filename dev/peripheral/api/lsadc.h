@@ -5,8 +5,6 @@
   * @brief   Header file of ADC HAL module.
   ******************************************************************************
   */
-
-/* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef _LSADC_H_
 #define _LSADC_H_
 #include <stdbool.h>
@@ -16,62 +14,57 @@
 #include "sdk_config.h"
 #include "reg_base_addr.h"
 
+/** \addtogroup PERIPHERAL
+ *  @{
+ */
+
+/** \addtogroup LSADC
+ *  @{
+ */
+
+/// LSADC Macro for Register Access
 #ifdef LSADC_BASE_ADDR
 #define LSADC ((reg_adc_t *)LSADC_BASE_ADDR)
 #endif
 
+/// ADC CLOCK
 #define ADC_CLOCK   (SDK_PCLK_MHZ*1000000)
 
-/** 
-  * @struct  ADC_InitTypeDef
-  * @brief  Structure definition of ADC and regular group initialization 
-  * @note   Parameters of this structure are shared within 2 scopes:
-  *          - Scope entire ADC (affects regular and injected groups): DataAlign, ScanConvMode.
-  *          - Scope regular group: ContinuousConvMode, NbrOfConversion, DiscontinuousConvMode, NbrOfDiscConversion, ExternalTrigConvEdge, ExternalTrigConv.
-  * @note   The setting of these parameters with function HAL_ADC_Init() is conditioned to ADC state.
-  *         ADC can be either disabled or enabled without conversion on going on regular group.
+
+/**
+  * @brief  ADC Configuration Structure definition
   */
 typedef struct
 {
     uint32_t DataAlign;                    /*!< Specifies ADC data alignment to right (MSB on register bit 11 and LSB on register bit 0) (default setting)
-                                                  or to left (if regular group: MSB on register bit 15 and LSB on register bit 4, if injected group (MSB kept as signed value due to potential negative value after offset application): MSB on register bit 14 and LSB on register bit 3).
-                                                  This parameter can be a value of @ref ADC_Data_align */
+                                                or to left (MSB on register bit 15 and LSB on register bit 4).This parameter can be a value of @ref ADC_Data_align */
     uint32_t ScanConvMode;                 /*!< Configures the sequencer of regular and injected groups.
-                                                  This parameter can be associated to parameter 'DiscontinuousConvMode' to have main sequence subdivided in successive parts.
-                                                  If disabled: Conversion is performed in single mode (one channel converted, the one defined in rank 1).
-                                                               Parameters 'NbrOfConversion' and 'InjectedNbrOfConversion' are discarded (equivalent to set to 1).
-                                                  If enabled:  Conversions are performed in sequence mode (multiple ranks defined by 'NbrOfConversion'/'InjectedNbrOfConversion' and each channel rank).
-                                                               Scan direction is upward: from rank1 to rank 'n'.
-                                                  This parameter can be a value of @ref ADC_Scan_mode
-                                                  Note: For regular group, this parameter should be enabled in conversion either by polling (HAL_ADC_Start with Discontinuous mode and NbrOfDiscConversion=1)
-                                                        or by DMA (HAL_ADC_Start_DMA), but not by interruption (HAL_ADC_Start_IT): in scan mode, interruption is triggered only on the
-                                                        the last conversion of the sequence. All previous conversions would be overwritten by the last one.
-                                                        Injected group used with scan mode has not this constraint: each rank has its own result register, no data is overwritten. */
+                                                This parameter can be associated to parameter 'DiscontinuousConvMode' to have main sequence subdivided in successive parts.
+                                                If enabled:  Conversions are performed in sequence mode (each channel rank). */
+                                    
     FunctionalState ContinuousConvMode;    /*!< Specifies whether the conversion is performed in single mode (one conversion) or continuous mode for regular group,
-                                                  after the selected trigger occurred (software start or external trigger).
-                                                  This parameter can be set to ENABLE or DISABLE. */
+                                                after the selected trigger occurred (software start or external trigger).
+                                                This parameter can be set to ENABLE or DISABLE. */
     uint32_t NbrOfConversion;              /*!< Specifies the number of ranks that will be converted within the regular group sequencer.
-                                                  To use regular group sequencer and convert several ranks, parameter 'ScanConvMode' must be enabled.
-                                                  This parameter must be a number between Min_Data = 1 and Max_Data = 16. */
+                                                This parameter must be a number between Min_Data = 1 and Max_Data = 16. */
     FunctionalState DiscontinuousConvMode; /*!< Specifies whether the conversions sequence of regular group is performed in Complete-sequence/Discontinuous-sequence (main sequence subdivided in successive parts).
-                                                  Discontinuous mode is used only if sequencer is enabled (parameter 'ScanConvMode'). If sequencer is disabled, this parameter is discarded.
-                                                  Discontinuous mode can be enabled only if continuous mode is disabled. If continuous mode is enabled, this parameter setting is discarded.
-                                                  This parameter can be set to ENABLE or DISABLE. */
+                                                This parameter can be set to ENABLE or DISABLE. */
     uint32_t NbrOfDiscConversion;          /*!< Specifies the number of discontinuous conversions in which the  main sequence of regular group (parameter NbrOfConversion) will be subdivided.
-                                                  If parameter 'DiscontinuousConvMode' is disabled, this parameter is discarded.
-                                                  This parameter must be a number between Min_Data = 1 and Max_Data = 8. */
-    uint32_t TrigType;                     /*!< Selects the external event used to trigger the conversion start of regular group.
-                                                  If set to ADC_SOFTWARE_START, external triggers are disabled.
-                                                  If set to external trigger source, triggering is on event rising edge.
-                                                  This parameter can be a value of @ref ADC_External_trigger_source_Regular */
-    uint32_t Vref;                          /*!<Select ADC reference voltage, please refer to the type @ref enum ADC_Vref_TypeDef*/
+                                                If parameter 'DiscontinuousConvMode' is disabled, this parameter is discarded.
+                                                This parameter must be a number between Min_Data = 1 and Max_Data = 8. */
+    uint32_t TrigType;                     /*!< Selects the external event used to trigger the conversion start of regular group. */
 
-    uint32_t AdcDriveType;                /*!<Select ADC Driving mode, please refer to the type @ref  enum ADC_Drv_TypeDef*/
+    uint32_t Vref;                         /*!< Select ADC reference voltage, please refer to the type @ref enum ADC_Vref_TypeDef*/
 
-    uint32_t AdcCkDiv;                    /*!<ADC division coefficient ranges from 1 to 128 */
+    uint32_t AdcDriveType;                 /*!< Select ADC Driving mode, please refer to the type @ref  enum ADC_Drv_TypeDef*/
+
+    uint32_t AdcCkDiv;                     /*!< ADC division coefficient ranges from 1 to 128 */
 } ADC_InitTypeDef;
 
 
+/**
+  * @brief  ADC Injected Configuration Structure definition
+  */
 typedef struct 
 {
   uint32_t InjectedChannel;                       /*!< Selection of ADC channel to configure
@@ -79,6 +72,7 @@ typedef struct
   uint32_t InjectedRank;                          /*!< Rank in the injected group sequencer
                                                        This parameter must be a value of @ref ADCEx_injected_rank*/
   uint32_t InjectedSamplingTime;                  /*!< Sampling time value to be set for the selected channel. */
+
   uint32_t InjectedOffset;                        /*!< Defines the offset to be subtracted from the raw converted data (for channels set on injected group only).
                                                        Offset value must be a positive number.
                                                        Depending of ADC resolution selected (12, 10, 8 or 6 bits),
@@ -87,8 +81,6 @@ typedef struct
                                                        To use the injected group sequencer and convert several ranks, parameter 'ScanConvMode' must be enabled.
                                                        This parameter must be a number between Min_Data = 1 and Max_Data = 4. */
   FunctionalState InjectedDiscontinuousConvMode;  /*!< Specifies whether the conversions sequence of injected group is performed in Complete-sequence/Discontinuous-sequence (main sequence subdivided in successive parts).
-                                                       Discontinuous mode is used only if sequencer is enabled (parameter 'ScanConvMode'). If sequencer is disabled, this parameter is discarded.
-                                                       Discontinuous mode can be enabled only if continuous mode is disabled. If continuous mode is enabled, this parameter setting is discarded.
                                                        This parameter can be set to ENABLE or DISABLE. */
   FunctionalState AutoInjectedConv;               /*!< Enables or disables the selected ADC automatic injected group conversion after regular one
                                                        This parameter can be set to ENABLE or DISABLE.*/
@@ -103,7 +95,7 @@ typedef struct
 {
     uint32_t    Channel;      /*!< Specifies the channel to configure into ADC regular group.  */
     uint32_t    Rank;         /*!< Specifies the rank in the regular group sequencer 
-                                        This parameter can be a value of @ref ADC_regular_rank */
+                                    This parameter can be a value of @ref ADC_regular_rank */
     uint32_t    SamplingTime; /*!< Sampling time value to be set for the selected channel.     */
 } ADC_ChannelConfTypeDef;
 
@@ -128,40 +120,47 @@ typedef struct
     uint32_t WatchdogNumber; /*!< Reserved for future use, can be set to 0 */
 } ADC_AnalogWDGConfTypeDef;
 
-/** 
-  * @brief  HAL ADC state machine: ADC states definition (bitfields)
+
+ /** @defgroup HAL ADC states definition
+  * @{
   */
-/* States of ADC global scope */
 #define HAL_ADC_STATE_RESET 0x00000000U         /*!< ADC not yet initialized or disabled */
 #define HAL_ADC_STATE_READY 0x00000001U         /*!< ADC peripheral ready for use */
-#define HAL_ADC_STATE_BUSY_INTERNAL 0x00000002U /*!< ADC is busy to internal process (initialization, calibration) */
+#define HAL_ADC_STATE_BUSY_INTERNAL 0x00000002U /*!< ADC is busy to internal process  */
 #define HAL_ADC_STATE_TIMEOUT 0x00000004U       /*!< TimeOut occurrence */
 
-/* States of ADC errors */
+ /** @defgroup States of ADC errors
+  * @{
+  */
 #define HAL_ADC_STATE_ERROR_INTERNAL 0x00000010U /*!< Internal error occurrence */
 #define HAL_ADC_STATE_ERROR_CONFIG 0x00000020U   /*!< Configuration error occurrence */
 #define HAL_ADC_STATE_ERROR_DMA 0x00000040U      /*!< DMA error occurrence */
 
-/* States of ADC group regular */
-#define HAL_ADC_STATE_REG_BUSY 0x00000100U  /*!< A conversion on group regular is ongoing or can occur (either by continuous mode, \
-                                                external trigger, low power auto power-on, multimode ADC master control) */
+ /** @defgroup States of ADC group regular
+  * @{
+  */
+#define HAL_ADC_STATE_REG_BUSY 0x00000100U  /*!< A conversion on group regular is ongoing or can occur  */
 #define HAL_ADC_STATE_REG_EOC 0x00000200U   /*!< Conversion data available on group regular */
 #define HAL_ADC_STATE_REG_OVR 0x00000400U   /*!< Not available on  device: Overrun occurrence */
 #define HAL_ADC_STATE_REG_EOSMP 0x00000800U /*!< Not available on  device: End Of Sampling flag raised  */
 
-/* States of ADC group injected */
-#define HAL_ADC_STATE_INJ_BUSY 0x00001000U  /*!< A conversion on group injected is ongoing or can occur (either by auto-injection mode, \
-                                                external trigger, low power auto power-on, multimode ADC master control) */
+
+/** @defgroup States of ADC group injected
+  * @{
+  */
+#define HAL_ADC_STATE_INJ_BUSY 0x00001000U  /*!< A conversion on group injected is ongoing or can occur  */
 #define HAL_ADC_STATE_INJ_EOC 0x00002000U   /*!< Conversion data available on group injected */
 #define HAL_ADC_STATE_INJ_JQOVF 0x00004000U /*!< Not available on  device: Injected queue overflow occurrence */
 
-/* States of ADC analog watchdogs */
-#define HAL_ADC_STATE_AWD1 0x00010000U /*!< Out-of-window occurrence of analog watchdog 1 */
-#define HAL_ADC_STATE_AWD2 0x00020000U /*!< Not available on  device: Out-of-window occurrence of analog watchdog 2 */
-#define HAL_ADC_STATE_AWD3 0x00040000U /*!< Not available on  device: Out-of-window occurrence of analog watchdog 3 */
+/** @defgroup States of ADC analog watchdogs
+  * @{
+  */
+#define HAL_ADC_STATE_AWD1 0x00010000U      /*!< Out-of-window occurrence of analog watchdog 1 */
+#define HAL_ADC_STATE_AWD2 0x00020000U      /*!< Not available on  device: Out-of-window occurrence of analog watchdog 2 */
+#define HAL_ADC_STATE_AWD3 0x00040000U      /*!< Not available on  device: Out-of-window occurrence of analog watchdog 3 */
 
 /**
-  * @brief  ADC handle Structure definition  
+  * @brief  ADC DMA Environment 
   */
  struct AdcDMAEnv
 {
@@ -169,17 +168,23 @@ typedef struct
     uint8_t                       DMA_Channel;
 };
 
+/**
+  * @brief  ADC Interrupt Environment   
+  */
 struct AdcInterruptEnv
 {
     uint8_t                       *pBuffPtr;      /*!< Pointer to ADC data Buffer   */
     uint16_t                      XferCount;      /*!< UART ADC data Counter        */
 };
 
+/**
+  * @brief  ADC handle Structure definition
+  */
 typedef struct __ADC_HandleTypeDef
 {
-    reg_adc_t       *Instance; /*!< Register base address */
+    reg_adc_t       *Instance;              /*!< Register base address */
 
-    ADC_InitTypeDef Init; /*!< ADC required parameters */
+    ADC_InitTypeDef Init;                   /*!< ADC required parameters */
 
     void            *DMAC_Instance;
     union{
@@ -187,22 +192,22 @@ typedef struct __ADC_HandleTypeDef
         struct AdcInterruptEnv Interrupt;
     }Env;
 
-    HAL_LockTypeDef Lock; /*!< ADC locking object */
+    HAL_LockTypeDef Lock;                   /*!< ADC locking object */
 
-    volatile uint32_t State; /*!< ADC communication state (bitmap of ADC states) */
+    volatile uint32_t State;                /*!< ADC communication state (bitmap of ADC states) */
 
-    volatile uint32_t ErrorCode; /*!< ADC Error code */
+    volatile uint32_t ErrorCode;            /*!< ADC Error code */
 
 } ADC_HandleTypeDef;
 
- /** @enum ADC_Drv_TypeDef
+ /** 
   * @brief  driving ADC type enumeration definition 
   */
  enum ADC_Drv_TypeDef
  {
-    EINBUF_DRIVE_ADC,
-    INRES_ONETHIRD_EINBUF_DRIVE_ADC,    /*1/3 partial voltage input signal */
-    BINBUF_DIRECT_DRIVE_ADC, 
+    EINBUF_DRIVE_ADC,                   /*!< En Inbuf mode */
+    INRES_ONETHIRD_EINBUF_DRIVE_ADC,    /*!< 1/3 partial voltage input signal */
+    BINBUF_DIRECT_DRIVE_ADC,            /*!< By Pass Inbuf */
  };
 
 /**
@@ -222,10 +227,6 @@ typedef enum
 
 /* Exported constants --------------------------------------------------------*/
 
-/** @defgroup ADC_Exported_Constants ADC Exported Constants
-  * @{
-  */
-
 /** @defgroup ADC_Error_Code ADC Error Code
   * @{
   */
@@ -233,11 +234,8 @@ typedef enum
 #define HAL_ADC_ERROR_INTERNAL 0x01U /*!< ADC IP internal error: if problem of clocking, enable/disable, erroneous state                       */
 #define HAL_ADC_ERROR_OVR 0x02U      /*!< Overrun error                                         */
 #define HAL_ADC_ERROR_DMA 0x04U      /*!< DMA transfer error                                    */
-
 #define HAL_ADC_ERROR_INVALID_CALLBACK (0x10U) /*!< Invalid Callback error */
-/**
-  * @}
-  */
+
 
 /** @defgroup ADC_Data_align ADC data alignment
   * @{
@@ -251,9 +249,6 @@ typedef enum
 /** @defgroup ADC_Scan_mode ADC scan mode
   * @{
   */
-/* Note: Scan mode values are not among binary choices ENABLE/DISABLE for     */
-/*       compatibility with other devices having a sequencer with       */
-/*       additional options.                                                  */
 #define ADC_SCAN_DISABLE 0x00000000U
 #define ADC_SCAN_ENABLE ((uint32_t)ADC_SCAN_MASK)
 /**
@@ -289,33 +284,31 @@ typedef enum
 #define ADC_SAMPLETIME_4CYCLES  0x00000002U                 /*!< Sampling time 4 ADC clock cycles */
 #define ADC_SAMPLETIME_15CYCLES 0x00000003U                 /*!< Sampling time 15 ADC clock cycles */
 
-/** @enum ADC_Vref_TypeDef
+/** 
   * @brief  Reference voltage type enumeration definition 
   */
  enum ADC_Vref_TypeDef
  {
-    ADC_VREF_VCC,    /*!< system power*/
-    ADC_VREF_EXPOWER,  /*!< External power */
-    ADC_VREF_INSIDE,   /*!< inside power */
+    ADC_VREF_VCC,           /*!< system power*/
+    ADC_VREF_EXPOWER,       /*!< External power */
+    ADC_VREF_INSIDE,        /*!< inside power */
  };
-
 /**
   * @}
   */
-/* ADC conversion cycles (unit: ADC clock cycles)                           */
-/* (selected sampling time + conversion time of 12.5 ADC clock cycles, with */
-/* resolution 12 bits)                                                      */
+
+/** 
+  * @brief  ADC conversion cycles
+  * @note   Selected sampling time + conversion time of 15 ADC clock cycles, with resolution 12 bits
+  */
 #define ADC_CONVERSIONCLOCKCYCLES_SAMPLETIME_1CYCLE                  13U
 #define ADC_CONVERSIONCLOCKCYCLES_SAMPLETIME_2CYCLES                 14U
 #define ADC_CONVERSIONCLOCKCYCLES_SAMPLETIME_4CYCLES                 16U
 #define ADC_CONVERSIONCLOCKCYCLES_SAMPLETIME_15CYCLES                27U
 
-
-/** @defgroup ADC_channels ADC channels
-  * @{
+/** 
+  * @brief  ADC_channels ADC channels
   */
-/* Note: Depending on devices, some channels may not be available on package  */
-/*       pins. Refer to device datasheet for channels availability.           */
 #define ADC_CHANNEL_0               0x00000000U
 #define ADC_CHANNEL_1               0x00000001U
 #define ADC_CHANNEL_2               0x00000002U
@@ -329,9 +322,7 @@ typedef enum
 #define ADC_CHANNEL_VBAT            0x0000000AU  /* ADC internal channel (no connection on device pin) */
 #define ADC_CHANNEL_VREFINT         0x0000000BU  /* ADC internal channel (no connection on device pin) */
 
-/**
-  * @}
-  */
+
 /** @defgroup ADC_regular_rank ADC rank into regular group
   * @{
   */
@@ -396,45 +387,23 @@ typedef enum
 #define ADC_FLAG_JEOC   ADC_JEOC_MASK     /*!< ADC End of Injected conversion flag */
 #define ADC_FLAG_JEOS   ADC_JEOS_MASK     /*!< ADC Injected end of sequence conversions flag */
 #define ADC_FLAG_AWD    ADC_AWD_MASK      /*!< ADC Analog watchdog flag */
-/**
-  * @}
-  */
-/** @defgroup ADC_Event_type ADC Event type
-  * @{
+
+/** 
+  * @brief  ADC_Event_type ADC Event type
   */
 #define ADC_AWD_EVENT ((uint32_t)ADC_FLAG_AWD) /*!< ADC Analog watchdog event */
-
 #define ADC_AWD1_EVENT ADC_AWD_EVENT /*!< ADC Analog watchdog 1 event: Alternate naming for compatibility with other devices having several analog watchdogs */
 /**
   * @}
   */
 
-/* Private constants ---------------------------------------------------------*/
-/**
-  * @}
-  */
 
 /* Combination of all post-conversion flags bits: EOC/EOS, JEOC/JEOS, OVR, AWDx */
 #define ADC_FLAG_POSTCONV_ALL (ADC_FLAG_EOS | ADC_FLAG_EOC | ADC_FLAG_JEOC | ADC_FLAG_JEOS | ADC_FLAG_AWD)
 
-/**
-  * @}
-  */
-
-/* Exported macro ------------------------------------------------------------*/
-
-/** @defgroup ADC_Exported_Macros ADC Exported Macros
-  * @{
-  */
-/* Macro for internal HAL driver usage, and possibly can be used into code of */
-/* final user.                                                                */
 
 /**
   * @brief Enable the ADC peripheral
-  * @note ADC enable requires a delay for ADC stabilization time
-  *       (refer to device datasheet, parameter tSTAB)
-  * @note On , if ADC is already enabled this macro trigs a conversion 
-  *       SW start on regular group.
   * @param __HANDLE__: ADC handle
   * @retval None
   */
@@ -454,7 +423,9 @@ typedef enum
   * @param __INTERRUPT__: ADC Interrupt
   *          This parameter can be any combination of the following values:
   *            @arg ADC_IT_EOC: ADC End of Regular Conversion interrupt source
+  *            @arg ADC_IT_EOS：ADC regular end of sequence conversions interrupt source 
   *            @arg ADC_IT_JEOC: ADC End of Injected Conversion interrupt source
+  *            @arg ADC_IT_JEOS：ADC Injected end of sequence conversions interrupt source
   *            @arg ADC_IT_AWD: ADC Analog watchdog interrupt source
   * @retval None
   */
@@ -466,7 +437,9 @@ typedef enum
   * @param __INTERRUPT__: ADC Interrupt
   *          This parameter can be any combination of the following values:
   *            @arg ADC_IT_EOC: ADC End of Regular Conversion interrupt source
+  *            @arg ADC_IT_EOS：ADC regular end of sequence conversions interrupt source 
   *            @arg ADC_IT_JEOC: ADC End of Injected Conversion interrupt source
+  *            @arg ADC_IT_JEOS：ADC Injected end of sequence conversions interrupt source
   *            @arg ADC_IT_AWD: ADC Analog watchdog interrupt source
   * @retval None
   */
@@ -478,24 +451,15 @@ typedef enum
   * @param __INTERRUPT__: ADC interrupt source to check
   *          This parameter can be any combination of the following values:
   *            @arg ADC_IT_EOC: ADC End of Regular Conversion interrupt source
+  *            @arg ADC_IT_EOS：ADC regular end of sequence conversions interrupt source 
   *            @arg ADC_IT_JEOC: ADC End of Injected Conversion interrupt source
+  *            @arg ADC_IT_JEOS：ADC Injected end of sequence conversions interrupt source
   *            @arg ADC_IT_AWD: ADC Analog watchdog interrupt source
   * @retval None
   */
 #define __HAL_ADC_GET_IT_SOURCE(__HANDLE__, __INTERRUPT__) \
     (((__HANDLE__)->Instance->CR1 & (__INTERRUPT__)) == (__INTERRUPT__))
 
-/** @brief Get the selected ADC's flag status.
-  * @param __HANDLE__: ADC handle
-  * @param __FLAG__: ADC flag
-  *          This parameter can be any combination of the following values:
-  *            @arg ADC_FLAG_STRT: ADC Regular group start flag
-  *            @arg ADC_FLAG_JSTRT: ADC Injected group start flag
-  *            @arg ADC_FLAG_EOC: ADC End of Regular conversion flag
-  *            @arg ADC_FLAG_JEOC: ADC End of Injected conversion flag
-  *            @arg ADC_FLAG_AWD: ADC Analog watchdog flag
-  * @retval None
-  */
 
 /** @brief Get the selected ADC's flag status.
   * @param __HANDLE__: ADC handle
@@ -504,12 +468,15 @@ typedef enum
   *            @arg ADC_FLAG_STRT: ADC Regular group start flag
   *            @arg ADC_FLAG_JSTRT: ADC Injected group start flag
   *            @arg ADC_FLAG_EOC: ADC End of Regular conversion flag
+  *            @arg ADC_FLAG_EOS：ADC regular end of sequence conversions flag 
   *            @arg ADC_FLAG_JEOC: ADC End of Injected conversion flag
+  *            @arg ADC_FLAG_JEOS：ADC Injected end of sequence conversions flag 
   *            @arg ADC_FLAG_AWD: ADC Analog watchdog flag
   * @retval None
   */
 #define __HAL_ADC_GET_FLAG(__HANDLE__, __FLAG__) \
     ((((__HANDLE__)->Instance->SR) & (__FLAG__)) == (__FLAG__))
+
 
 /** @brief Clear the ADC's pending flags
   * @param __HANDLE__: ADC handle
@@ -518,7 +485,9 @@ typedef enum
   *            @arg ADC_FLAG_STRT: ADC Regular group start flag
   *            @arg ADC_FLAG_JSTRT: ADC Injected group start flag
   *            @arg ADC_FLAG_EOC: ADC End of Regular conversion flag
+  *            @arg ADC_FLAG_EOS：ADC regular end of sequence conversions flag 
   *            @arg ADC_FLAG_JEOC: ADC End of Injected conversion flag
+  *            @arg ADC_FLAG_JEOS：ADC Injected end of sequence conversions flag 
   *            @arg ADC_FLAG_AWD: ADC Analog watchdog flag
   * @retval None
   */
@@ -658,8 +627,6 @@ typedef enum
   * @param _SCAN_MODE_: Scan conversion mode.
   * @retval None
   */
-/* Note: Scan mode is compared to ENABLE for legacy purpose, this parameter   */
-/*       is equivalent to ADC_SCAN_ENABLE.                                    */
 
 #define ADC_CR1_SCAN_SET(_SCAN_MODE_) \
     ((((_SCAN_MODE_) == ADC_SCAN_ENABLE) || ((_SCAN_MODE_) == ENABLE)) ? (ADC_SCAN_ENABLE) : (ADC_SCAN_DISABLE))
@@ -685,25 +652,18 @@ typedef enum
 /**
   * @}
   */
-/** @defgroup ADC_range_verification ADC range verification
-  * For a unique ADC resolution: 12 bits
-  * @{
+/**  
+  * @brief ADC_range_verification ADC range verification For a unique ADC resolution: 12 bits
   */
 #define IS_ADC_RANGE(ADC_VALUE) ((ADC_VALUE) <= 0x0FFFU)
-/**
-  * @}
-  */
 
-/** @defgroup ADC_regular_nb_conv_verification ADC regular nb conv verification
-  * @{
+/**  
+  * @brief ADC_regular_nb_conv_verification ADC regular nb conv verification
   */
 #define IS_ADC_REGULAR_NB_CONV(LENGTH) (((LENGTH) >= 1U) && ((LENGTH) <= 16U))
-/**
-  * @}
-  */
 
-/** @defgroup ADC_regular_discontinuous_mode_number_verification ADC regular discontinuous mode number verification
-  * @{
+/**  
+  * @brief ADC_regular_discontinuous_mode_number_verification ADC regular discontinuous mode number verification
   */
 #define IS_ADC_REGULAR_DISCONT_NUMBER(NUMBER) (((NUMBER) >= 1U) && ((NUMBER) <= 8U))
 /**
@@ -757,13 +717,10 @@ typedef enum
                                        ((CHANNEL) == ADC_INJECTED_RANK_3) || \
                                        ((CHANNEL) == ADC_INJECTED_RANK_4))
 
-/** @defgroup ADCEx_injected_nb_conv_verification ADCEx injected nb conv verification
-  * @{
-  */
-#define IS_ADC_INJECTED_NB_CONV(LENGTH)  (((LENGTH) >= 1U) && ((LENGTH) <= 4U))
 /**
-  * @}
-  */    
+ * @brief ADCEx_injected_nb_conv_verification ADCEx injected nb conv verification
+ */
+#define IS_ADC_INJECTED_NB_CONV(LENGTH)  (((LENGTH) >= 1U) && ((LENGTH) <= 4U))
 
 /**
  * @brief Converts the sampled value of the temperature channel to the temperature value
@@ -781,69 +738,217 @@ HAL_StatusTypeDef HAL_ADC_DeInit(ADC_HandleTypeDef *hadc);
   * @}
   */
 
-/* IO operation functions  *****************************************************/
-
-/** @addtogroup ADC_Exported_Functions_Group2
-  * @{
-  */
 /* Exported functions --------------------------------------------------------*/
+/**
+  * @brief  Enable the selected ADC.
+  * @note   Prerequisite condition to use this function: ADC must be disabled
+  *         and voltage regulator must be enabled (done into HAL_ADC_Init()).
+  * @param  hadc: ADC handle
+  * @retval HAL status.
+  */
 HAL_StatusTypeDef ADC_Enable(ADC_HandleTypeDef *hadc);
+
+/**
+  * @brief  Stop ADC conversion and disable the selected ADC
+  * @note   Prerequisite condition to use this function: ADC conversions must be
+  *         stopped to disable the ADC.
+  * @param  hadc: ADC handle
+  * @retval HAL status.
+  */
 HAL_StatusTypeDef ADC_ConversionStop_Disable(ADC_HandleTypeDef *hadc);
 
-/* Blocking mode: Polling */
+/**
+  * @brief  Enables ADC, starts conversion of regular group.
+  *         Interruptions enabled in this function: None.
+  * @param  hadc: ADC handle
+  * @retval HAL status
+  */
 HAL_StatusTypeDef HAL_ADC_Start(ADC_HandleTypeDef *hadc);
-HAL_StatusTypeDef HAL_ADC_Stop(ADC_HandleTypeDef *hadc);
-HAL_StatusTypeDef HAL_ADC_PollForConversion(ADC_HandleTypeDef *hadc, uint32_t Timeout);
-// HAL_StatusTypeDef HAL_ADC_PollForEvent(ADC_HandleTypeDef *hadc, uint32_t EventType, uint32_t Timeout);
 
-/* Blocking mode: Polling */
+/**
+  * @brief  Stop ADC conversion of regular group (and injected channels in 
+  *         case of auto_injection mode), disable ADC peripheral.
+  * @param  hadc: ADC handle
+  * @retval HAL status.
+  */
+HAL_StatusTypeDef HAL_ADC_Stop(ADC_HandleTypeDef *hadc);
+
+/**
+  * @brief  Wait for regular group conversion to be completed.
+  * @param  hadc: ADC handle
+  * @param  Timeout: Timeout value in millisecond.
+  * @retval HAL status
+  */
+HAL_StatusTypeDef HAL_ADC_PollForConversion(ADC_HandleTypeDef *hadc, uint32_t Timeout);
+
+/**
+  * @brief  Enables ADC, starts conversion of injected group.
+  *         Interruptions enabled in this function: None.
+  * @param  hadc: ADC handle
+  * @retval HAL status
+  */
 HAL_StatusTypeDef HAL_ADCEx_InjectedStart(ADC_HandleTypeDef* hadc);
+
+/**
+  * @brief  Stop conversion of injected channels. Disable ADC peripheral if
+  *         no regular conversion is on going.
+  * @note   In case of auto-injection mode, HAL_ADC_Stop must be used.
+  * @param  hadc: ADC handle
+  * @retval None
+  */
 HAL_StatusTypeDef HAL_ADCEx_InjectedStop(ADC_HandleTypeDef* hadc);
+
+/**
+  * @brief  Wait for injected group conversion to be completed.
+  * @param  hadc: ADC handle
+  * @param  Timeout: Timeout value in millisecond.
+  * @retval HAL status
+  */
 HAL_StatusTypeDef HAL_ADCEx_InjectedPollForConversion(ADC_HandleTypeDef* hadc, uint32_t Timeout);
 
-/* Non-blocking mode: Interruption */
+/**
+  * @brief  Enables ADC, starts conversion of regular group with interruption.
+  *         Interruptions enabled in this function:
+  *          - EOC (end of conversion of regular group)
+  *         Each of these interruptions has its dedicated callback function.
+  * @param  hadc: ADC handle
+  * @retval HAL status
+  */
 HAL_StatusTypeDef HAL_ADC_Start_IT(ADC_HandleTypeDef *hadc);
+
+/**
+  * @brief  Stop ADC conversion of regular group (and injected group in 
+  *         case of auto_injection mode), disable interrution of 
+  *         end-of-conversion, disable ADC peripheral.
+  * @param  hadc: ADC handle
+  * @retval None
+  */
 HAL_StatusTypeDef HAL_ADC_Stop_IT(ADC_HandleTypeDef *hadc);
+
+/**
+  * @brief  Enables ADC, starts conversion of injected group with interruption.
+  *          - JEOC (end of conversion of injected group)
+  *         Each of these interruptions has its dedicated callback function.
+  * @param  hadc: ADC handle
+  * @retval HAL status.
+  */
 HAL_StatusTypeDef HAL_ADCEx_InjectedStart_IT(ADC_HandleTypeDef* hadc);
+
+/**
+  * @brief  Stop conversion of injected channels, disable interruption of 
+  *         end-of-conversion. Disable ADC peripheral if no regular conversion
+  *         is on going.
+  * @param  hadc: ADC handle
+  * @retval None
+  */
 HAL_StatusTypeDef HAL_ADCEx_InjectedStop_IT(ADC_HandleTypeDef* hadc);
-/* Non-blocking mode: DMA */
+
+
+/**
+  * @brief  Enables ADC, starts conversion of regular group and transfers result through DMA.
+  * @param  hadc: ADC handle
+  * @param  pData: The destination Buffer address.
+  * @param  Length: The length of data to be transferred from ADC peripheral to memory.
+  * @retval HAL status.
+  */
  HAL_StatusTypeDef HAL_ADC_Start_DMA(ADC_HandleTypeDef* hadc, uint16_t* pData, uint32_t Length,void (*Callback)());
+
+ /**
+  * @brief  Stop ADC conversion of regular group (and injected group in 
+  *         case of auto_injection mode), disable ADC DMA transfer, disable 
+  *         ADC peripheral.
+  * @param  hadc: ADC handle
+  * @retval HAL status.
+  */
  HAL_StatusTypeDef HAL_ADC_Stop_DMA(ADC_HandleTypeDef* hadc);
 
-HAL_StatusTypeDef HAL_ADCEx_MultiModeStart_DMA(ADC_HandleTypeDef *hadc, uint32_t *pData, uint32_t Length);
-HAL_StatusTypeDef HAL_ADCEx_MultiModeStop_DMA(ADC_HandleTypeDef *hadc); 
 
-/* ADC retrieve conversion value intended to be used with polling or interruption */
+/**
+  * @brief  Get ADC regular group conversion result.
+  * @param  hadc: ADC handle
+  * @retval ADC group regular conversion data
+  */
 uint32_t HAL_ADC_GetValue(ADC_HandleTypeDef *hadc);
+
+/**
+  * @brief  Get ADC injected group conversion result.
+  * @param  hadc: ADC handle
+  * @param  InjectedRank: the converted ADC injected rank.
+  *          This parameter can be one of the following values:
+  *            @arg ADC_INJECTED_RANK_1: Injected Channel1 selected
+  *            @arg ADC_INJECTED_RANK_2: Injected Channel2 selected
+  *            @arg ADC_INJECTED_RANK_3: Injected Channel3 selected
+  *            @arg ADC_INJECTED_RANK_4: Injected Channel4 selected
+  * @retval ADC group injected conversion data
+  */
 uint32_t HAL_ADCEx_InjectedGetValue(ADC_HandleTypeDef* hadc, uint32_t InjectedRank);
 
-/* ADC IRQHandler and Callbacks used in non-blocking modes (Interruption and DMA) */
-void HAL_ADC_IRQHandler(ADC_HandleTypeDef *hadc);
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc);
-void HAL_ADC_LevelOutOfWindowCallback(ADC_HandleTypeDef *hadc);
-void HAL_ADC_ErrorCallback(ADC_HandleTypeDef *hadc);
 /**
-  * @}
+  * @brief  Handles ADC interrupt request  
+  * @param  hadc: ADC handle
+  * @retval None
   */
+void HAL_ADC_IRQHandler(ADC_HandleTypeDef *hadc);
 
-/* Peripheral Control functions ***********************************************/
-/** @addtogroup ADC_Exported_Functions_Group3
-  * @{
+/**
+  * @brief  Conversion complete callback in non blocking mode 
+  * @param  hadc: ADC handle
+  * @retval None
+  */
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc);
+
+/**
+  * @brief  Analog watchdog callback in non blocking mode. 
+  * @param  hadc: ADC handle
+  * @retval None
+  */
+void HAL_ADC_LevelOutOfWindowCallback(ADC_HandleTypeDef *hadc);
+
+/**
+  * @brief  ADC error callback in non blocking mode
+  * @param  hadc: ADC handle
+  * @retval None
+  */
+void HAL_ADC_ErrorCallback(ADC_HandleTypeDef *hadc);
+
+/**
+  * @brief  Configures the the selected channel to be linked to the regular
+  *         group.
+  * @param  hadc: ADC handle
+  * @param  sConfig: Structure of ADC channel for regular group.
+  * @retval HAL status
   */
 HAL_StatusTypeDef HAL_ADC_ConfigChannel(ADC_HandleTypeDef *hadc, ADC_ChannelConfTypeDef *sConfig);
-HAL_StatusTypeDef HAL_ADCEx_InjectedConfigChannel(ADC_HandleTypeDef* hadc,ADC_InjectionConfTypeDef* sConfigInjected);
-/**
-  * @}
-  */
 
-/* Peripheral State functions *************************************************/
-/** @addtogroup ADC_Exported_Functions_Group4
-  * @{
+/**
+  * @brief  Configures the ADC injected group and the selected channel to be
+  *         linked to the injected group.
+  * @param  hadc: ADC handle
+  * @param  sConfigInjected: Structure of ADC injected group and ADC channel for
+  *         injected group.
+  * @retval None
+  */
+HAL_StatusTypeDef HAL_ADCEx_InjectedConfigChannel(ADC_HandleTypeDef* hadc,ADC_InjectionConfTypeDef* sConfigInjected);
+
+/**
+  * @brief  return the ADC state
+  * @param  hadc: ADC handle
+  * @retval HAL state
   */
 uint32_t HAL_ADC_GetState(ADC_HandleTypeDef *hadc);
+
+/**
+  * @brief  Return the ADC error code
+  * @param  hadc: ADC handle
+  * @retval ADC Error Code
+  */
 uint32_t HAL_ADC_GetError(ADC_HandleTypeDef *hadc);
 
-/* ADC IRQHandler and Callbacks used in non-blocking modes (Interruption) */
+/**
+  * @brief  Injected conversion complete callback in non blocking mode 
+  * @param  hadc: ADC handle
+  * @retval None
+  */
 void  HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef* hadc);
 /**
   * @}
