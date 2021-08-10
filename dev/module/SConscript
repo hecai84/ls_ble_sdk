@@ -5,6 +5,7 @@ src = [
     'common/linked_async_framework.c',
     'common/async_call.c',
     'common/sw_timer.c',
+    'calendar/calendar.c',
     'crc/crc16.c',
     'debug/log.c',
     'debug/ls_dbg.c',
@@ -39,6 +40,7 @@ inc = [
     'ble/ll',
     'common',
     'adpcm',
+    'calendar',
 ]
 src_files = File(env.subst(src))
 inc_dirs = Dir(inc)

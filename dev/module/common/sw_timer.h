@@ -27,7 +27,13 @@ void sw_timer_period_set(struct sw_timer_env *timer,sw_timer_time_t period);
 
 sw_timer_time_t sw_timer_period_get(struct sw_timer_env *timer);
 
-void sw_timer_start(struct sw_timer_env *timer);
+void sw_timer_target_set(struct sw_timer_env *timer,sw_timer_time_t target);
+
+sw_timer_time_t sw_timer_target_get(struct sw_timer_env *timer);
+
+void sw_timer_insert(struct sw_timer_env *timer);
+
+sw_timer_time_t sw_timer_start(struct sw_timer_env *timer);
 
 void sw_timer_stop(struct sw_timer_env *timer);
 

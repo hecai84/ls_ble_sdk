@@ -22,6 +22,16 @@ sw_timer_time_t sw_timer_period_get(struct sw_timer_env *timer)
     return timer->period;
 }
 
+void sw_timer_target_set(struct sw_timer_env *timer,sw_timer_time_t target)
+{
+    timer->target = target;
+}
+
+sw_timer_time_t sw_timer_target_get(struct sw_timer_env *timer)
+{
+    return timer->target;
+}
+
 static bool insertion_compare(struct cdll_hdr *ptr,struct cdll_hdr *ref_hdr)
 {
     struct sw_timer_env *insert = CONTAINER_OF(ptr,struct sw_timer_env,hdr);
@@ -48,13 +58,20 @@ static void timer_insert(struct sw_timer_env *timer)
     cdll_insert(&sw_timer_list,&timer->hdr,insertion_compare);
 }
 
-void sw_timer_start(struct sw_timer_env *timer)
+void sw_timer_insert(struct sw_timer_env *timer)
 {
-    timer->target = timer_time_add(timer_time_get(),timer->period);
     uint32_t cpu_stat = ENTER_CRITICAL();
     timer_insert(timer);
     sw_timer_update();
     EXIT_CRITICAL(cpu_stat);
+}
+
+sw_timer_time_t sw_timer_start(struct sw_timer_env *timer)
+{
+    sw_timer_time_t current = timer_time_get();
+    timer->target = timer_time_add(current,timer->period);
+    sw_timer_insert(timer);
+    return current;
 }
 
 void sw_timer_stop(struct sw_timer_env *timer)
