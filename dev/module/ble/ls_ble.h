@@ -472,29 +472,7 @@ struct gap_sc_oob
     uint8_t conf[BLE_KEY_LEN];              /*!< Confirm Value*/
     uint8_t rand[BLE_KEY_LEN];              /*!< Random Number*/
 };
-/**
-  * @brief Slave Authentication mask.
-  */
-enum gap_slave_auth_mask
-{
-    GAP_SLAVE_AUTH_NONE           = 0,                   /*!< No Flag set*/
-    GAP_SLAVE_AUTH_BOND           = (1 << 0),            /*!< Bond authentication*/
-    GAP_SLAVE_AUTH_MITM           = (1 << 2),            /*!< Man In the middle protection*/
-    GAP_SLAVE_AUTH_SEC_CON        = (1 << 3),            /*!< Secure Connection*/
-    GAP_SLAVE_AUTH_KEY_NOTIF      = (1 << 4)             /*!< Key Notification*/
-};
-/**
-  * @brief Slave Authentication Requirements.
-  */
-enum gap_slave_auth
-{
-    GAP_SLAVE_AUTH_REQ_NO_MITM_NO_BOND  = (GAP_SLAVE_AUTH_NONE),                                                    /*!< No MITM No Bonding*/
-    GAP_SLAVE_AUTH_REQ_NO_MITM_BOND     = (GAP_SLAVE_AUTH_BOND),                                                    /*!< No MITM Bonding*/
-    GAP_SLAVE_AUTH_REQ_MITM_NO_BOND     = (GAP_SLAVE_AUTH_MITM),                                                    /*!< MITM No Bonding*/
-    GAP_SLAVE_AUTH_REQ_MITM_BOND        = (GAP_SLAVE_AUTH_MITM | GAP_SLAVE_AUTH_BOND),                              /*!< MITM and Bonding*/
-    GAP_SLAVE_AUTH_REQ_SEC_CON_NO_BOND  = (GAP_SLAVE_AUTH_SEC_CON | GAP_SLAVE_AUTH_MITM),                           /*!< SEC_CON and No Bonding*/
-    GAP_SLAVE_AUTH_REQ_SEC_CON_BOND     = (GAP_SLAVE_AUTH_SEC_CON | GAP_SLAVE_AUTH_MITM | GAP_SLAVE_AUTH_BOND),     /*!< SEC_CON and Bonding*/
-};
+
 /**
   * @brief Defgroup BLE_GAP_IO_CAPS GAP IO Capabilities.
   */
@@ -1166,7 +1144,7 @@ void gap_manager_master_encrypt(uint8_t con_idx);
  * \brief Initiate an encryption request from the slave. 
  * 
  * \param[in]  con_idx           Connection ID number.
- * \param[in]  auth              SEC Auth param, This parameter can be a value of @ref gap_slave_auth
+ * \param[in]  auth              SEC Auth param, This parameter can be a value of @ref gap_pair_auth
  ****************************************************************************************
  */
 void gap_manager_slave_security_req(uint8_t con_idx, uint8_t auth);
