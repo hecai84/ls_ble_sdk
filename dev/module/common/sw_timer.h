@@ -6,6 +6,10 @@
 #ifdef LE501X
 #define MS_2_PERIOD(x) (2000*(x)/625)
 #define PERIOD_2_MS(x) (625*(x)/2000)
+#else
+#include "ll_port.h"
+#define MS_2_PERIOD(x) ((x)*MAC_CLK_MHZ*1000)
+#define PERIOD_2_MS(x) ((x)/MAC_CLK_MHZ/1000)
 #endif
 
 typedef uint32_t sw_timer_time_t;

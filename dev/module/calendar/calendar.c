@@ -5,6 +5,8 @@
 #include "cpu.h"
 #ifdef LE501X
 #define SW_CALENDAR_BASE_TIMER_PERIOD_MS ((uint64_t)11*3600*1000)
+#else
+#define SW_CALENDAR_BASE_TIMER_PERIOD_MS (134*1000)
 #endif
 
 static struct sw_timer_env calendar_base_timer;
@@ -26,7 +28,7 @@ static void get_current_internal_time(sw_timer_time_t *sw_timer_time,time_t *abs
 {
     sw_timer_time_t current = timer_time_get();
     int diff = timer_time_compare(current,timer_count);
-    time_t now = PERIOD_2_MS(diff)/1000;
+    time_t now = PERIOD_2_MS(diff)/1000 + time_base;
     if(sw_timer_time)
     {
         *sw_timer_time = current;
