@@ -263,6 +263,12 @@ void qspi_flash_io_deinit(void)
     REG_FIELD_WR(SYSC_AWO->PIN_SEL0,SYSC_AWO_QSPI_EN,0);
 }
 
+void usb_func_enable(uint8_t dp,uint8_t dm)
+{
+    per_func_enable(pin2func_io((gpio_pin_t *)&dp),USB_DP);
+    per_func_enable(pin2func_io((gpio_pin_t *)&dm),USB_DM);
+}
+
 void uart2_io_init(uint8_t txd,uint8_t rxd);
 void uart2_io_deinit(void);
 

@@ -75,7 +75,10 @@
         "lscache_msp.h": "c",
         "ll_port.h": "c",
         "reg_v33_rg.h": "c",
-        "calc_div.h": "c"
+        "calc_div.h": "c",
+        "sw_timer_port.h": "c",
+        "sw_timer.h": "c",
+        "reg_sysc_cpu.h": "c"
     },
     "editor.detectIndentation": false,
     "restructuredtext.confPath": "${workspaceFolder}\\doc",

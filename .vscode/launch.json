@@ -30,10 +30,28 @@
 
         },
         {
+            "name": "TAURUS CPPDBG RAM_TEST",
+            "type": "cppdbg",
+            "request": "launch",
+            "miDebuggerServerAddress": "172.28.80.1:1025",
+            "program": "build/taurus/examples/ram_test.elf",
+            "cwd": "${workspaceFolder}",
+            "MIMode": "gdb",
+            "miDebuggerPath": "riscv64-unknown-elf-gdb",
+            "miDebuggerArgs":"",
+            "setupCommands": [
+                {
+                    "description": "为 gdb 启用整齐打印",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+        },
+        {
             "name": "TAURUS RAM_TEST",
             "type": "gdb",
             "request": "attach",
-            "target": "localhost:1025",
+            "target": "172.28.80.1:1025",
             "executable": "build/taurus/examples/ram_test.elf",
             "cwd": "${workspaceFolder}",
             "remote": true,

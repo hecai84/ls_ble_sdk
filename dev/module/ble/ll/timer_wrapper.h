@@ -5,10 +5,6 @@
 typedef struct sw_timer_env timer_env_t;
 typedef struct sw_timer_env *timer_t;
 
-#define MS_2_PERIOD(x) ((x)*MAC_CLK_MHZ*1000)
-
-#define PERIOD_2_MS(x) ((x)/MAC_CLK_MHZ/1000)
-
 timer_t timer_create(void (*callback)(void *),void *param,uint32_t period);
 
 void timer_delete(timer_t timer);

@@ -36,14 +36,15 @@ struct adv_set_env
     struct adv_current_tx_env current_tx;
     struct sync_env *periodic;
     timer_t duration_timer;
-    uint32_t secondary_anchor;
+    uint32_t secondary_series_start;
+    uint32_t next_secondary_anchor;
     uint32_t conn_req_end_time;
     struct adv_data_scan_rsp_data data_list[2];
     struct le_ext_adv_param ext_param;
     struct bd_addr rand_addr;
     struct adv_evt_rx_data rx;
-    //uint8_t skip_cnt;
     enum conn_req_status connection_requesting;
+    uint8_t next_second_ch;
     uint8_t max_evt;
     uint8_t completed_evts;
     uint8_t secondary_status;
