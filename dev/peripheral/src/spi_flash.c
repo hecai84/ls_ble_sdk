@@ -131,12 +131,12 @@ void spi_flash_quad_page_program(uint32_t offset,uint8_t *data,uint16_t length)
 
 void spi_flash_dual_page_program(uint32_t offset,uint8_t *data,uint16_t length)
 {
-    spi_flash_program_operation(offset,data,length,SINGLE_WIRE);
+    spi_flash_program_operation(offset,data,length,DUAL_WIRE);
 }
 
 void spi_flash_page_program(uint32_t offset,uint8_t *data,uint16_t length)
 {
-    spi_flash_program_operation(offset,data,length,DUAL_WIRE);
+    spi_flash_program_operation(offset,data,length,SINGLE_WIRE);
 }
 
 void do_spi_flash_erase(uint32_t offset,uint8_t opcode)

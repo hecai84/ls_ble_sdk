@@ -7,7 +7,7 @@
 #define GLOBAL_INT_MASK_STATUS() (CLIC->MINTTHRESH)
 #endif
 
-void do_spi_flash_program_svcall(uint32_t offset,uint8_t *data,uint16_t length,bool quad);
+void do_spi_flash_program_svcall(uint32_t offset,uint8_t *data,uint16_t length,uint8_t multi_type);
 void do_spi_flash_erase_svcall(uint32_t offset,uint8_t opcode);
 void do_spi_flash_read_svcall(void *param);
 void do_spi_flash_read_reg_svcall(void *param);

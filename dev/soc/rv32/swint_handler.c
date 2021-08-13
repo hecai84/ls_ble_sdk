@@ -11,7 +11,7 @@ void SWINT_Handler_C(uint32_t *args)
     args[9] = func(args[9],args[8],args[7],args[6]);
 }
 
-XIP_BANNED __attribute__((naked)) void do_spi_flash_program_svcall(uint32_t offset,uint8_t *data,uint16_t length,bool quad)
+XIP_BANNED __attribute__((naked)) void do_spi_flash_program_svcall(uint32_t offset,uint8_t *data,uint16_t length,uint8_t multi_type)
 {
     SWINT_FUNC_CALL_INLINE_ASM(do_spi_flash_program,flash_swint_set);
 }
