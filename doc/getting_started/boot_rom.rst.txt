@@ -11,7 +11,7 @@ UART MODE
 
     UART模式中，多字节数据以小端方式传输。
 
-进入UART模式后，首先，同步波特率。向芯片发送0x55，芯片接收该字节实现波特率同步后，会回复0xaa，之后芯片循环解析命令，执行并响应。
+进入UART模式后，首先，同步波特率。向芯片发送0x55，芯片接收该字节实现波特率同步后，会回复0xaa，接着需要发送同步字：0X3C,0X3C,0XA5,0XA5,芯片回复0XC3,0XC3,0XA5,0XA5.之后芯片循环解析命令，执行并响应。
 
 所支持的命令：
 
@@ -37,13 +37,13 @@ UART MODE
  FLASH_READ_JEDEC_ID（0x10）
  FLASH_READ_UNIQUE_ID（0x11）
  FLASH_ERASE_SECURITY_AREA（0x12）               索引（1字节）
- FLASH_PROGRAM_SECURITY_AREA（0x13）             索引（1字节），地址（3字节）
+ FLASH_PROGRAM_SECURITY_AREA（0x13）             索引（1字节），地址（3字节），数据
  FLASH_READ_SECURITY_AREA（0x14）                索引（1字节），地址（3字节）
  FLASH_SOFTWARE_RESET（0x15）                    
  MEM32_WRITE_MULTI（0x16）                       数量（1字节），{地址（4字节），数据（4字节）}*数量
  FLASH_DUAL_IO_READ（0x17）                      偏移（4字节），长度（4字节）
  FLASH_DUAL_PAGE_PROGRAM（0x18）                 偏移（4字节），长度（4字节）
-
+ FLASH INIT (0X19)                               配置字 00 双线 01 四线
 
 每条命令执行后，芯片都会响应，响应数据格式如下：
 
