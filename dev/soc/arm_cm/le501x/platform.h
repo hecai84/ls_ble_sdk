@@ -9,6 +9,8 @@
 #define RESET_OTA_FAILED       0xBDBDBDBD
 #define RESET_OTA_REQ          0xDDDDDDDD
 
+#define LSI_CNT_CYCLES (100)
+
 enum OTA_settings_type
 {
     SINGLE_FOREGROUND = 0,
@@ -67,7 +69,9 @@ void rco_freq_counting_start(void);
 uint32_t lpcycles_to_hus(uint32_t lpcycles);
 
 uint32_t us_to_lpcycles(uint32_t us);
-
+#if SDK_LSI_USED
+uint16_t get_lsi_cnt_val(void);
+#endif
 uint32_t lsi_freq_update_and_hs_to_lpcycles(int32_t hs_cnt);
 
 uint64_t idiv_acc(uint32_t,uint32_t,bool);

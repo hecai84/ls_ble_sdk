@@ -120,7 +120,7 @@ static uint32_t flash_data_storage_base_offset()
 void irq_reinit()
 {
     irq_priority();
-    NVIC->ISER[0] = 1<<CACHE_IRQn|1<<LPWKUP_IRQn|1<<EXTI_IRQn;
+    NVIC->ISER[0] = 1<<CACHE_IRQn|1<<LPWKUP_IRQn|1<<EXTI_IRQn|1<<RTC_IRQn;
 }
 
 static void irq_init()
@@ -154,7 +154,7 @@ static void mac_init()
 #if SDK_LSI_USED
 static uint16_t lsi_cnt_val;
 static uint16_t lsi_dummy_cnt;
-#define LSI_CNT_CYCLES (100)
+
 static void GPTIM_IRQ_Handler_For_LSI_Counting()
 {
     LSGPTIMB->ICR = TIMER_ICR_UIE_MASK;         // Clear interrupt
@@ -209,6 +209,11 @@ uint32_t lpcycles_to_hus(uint32_t lpcycles)
 uint32_t us_to_lpcycles(uint32_t us)
 {
     return us*LSI_CNT_CYCLES/lsi_cnt_val;
+}
+
+uint16_t get_lsi_cnt_val(void)
+{
+    return lsi_cnt_val;
 }
 
 uint32_t lsi_freq_update_and_hs_to_lpcycles(int32_t hs_cnt)
