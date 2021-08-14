@@ -337,7 +337,7 @@
               <MiscControls>--c99 -O2</MiscControls>
               <Define>LE501X</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\module\crc;..\..\..\..\module\debug;..\..\..\..\module\debug\RTT;..\..\..\..\module\static_buffer;..\..\..\..\module\tinyfs;..\..\..\..\module\tinycrypt\lib\include;..\..\..\..\module\ble;..\..\..\..\module\ble\prf;..\..\..\..\module\ble\ll;..\..\..\..\module\common;..\..\..\..\module\adpcm;..\..\..\..\peripheral\ecc;..\..\..\..\peripheral\api;..\..\..\..\peripheral\inc;..\..\..\..\soc\arm_cm;..\..\..\..\soc\arm_cm\cmsis;..\..\..\..\soc\arm_cm\le501x;..\..\..\..\soc\arm_cm\le501x\integration;..\..\..\..\soc;..\..\..\..;..;</IncludePath>
+              <IncludePath>..\..\..\..\module\crc;..\..\..\..\module\debug;..\..\..\..\module\debug\RTT;..\..\..\..\module\static_buffer;..\..\..\..\module\tinyfs;..\..\..\..\module\tinycrypt\lib\include;..\..\..\..\module\ble;..\..\..\..\module\ble\prf;..\..\..\..\module\ble\ll;..\..\..\..\module\common;..\..\..\..\module\adpcm;..\..\..\..\module\calendar;..\..\..\..\peripheral\ecc;..\..\..\..\peripheral\api;..\..\..\..\peripheral\inc;..\..\..\..\soc\arm_cm;..\..\..\..\soc\arm_cm\cmsis;..\..\..\..\soc\arm_cm\le501x;..\..\..\..\soc\arm_cm\le501x\integration;..\..\..\..\soc;..\..\..\..;..;</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -355,7 +355,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\module\crc;..\..\..\..\module\debug;..\..\..\..\module\debug\RTT;..\..\..\..\module\static_buffer;..\..\..\..\module\tinyfs;..\..\..\..\module\tinycrypt\lib\include;..\..\..\..\module\ble;..\..\..\..\module\ble\prf;..\..\..\..\module\ble\ll;..\..\..\..\module\common;..\..\..\..\module\adpcm;..\..\..\..\peripheral\ecc;..\..\..\..\peripheral\api;..\..\..\..\peripheral\inc;..\..\..\..\soc\arm_cm;..\..\..\..\soc\arm_cm\cmsis;..\..\..\..\soc\arm_cm\le501x;..\..\..\..\soc\arm_cm\le501x\integration;..\..\..\..\soc;..\..\..\..;..;</IncludePath>
+              <IncludePath>..\..\..\..\module\crc;..\..\..\..\module\debug;..\..\..\..\module\debug\RTT;..\..\..\..\module\static_buffer;..\..\..\..\module\tinyfs;..\..\..\..\module\tinycrypt\lib\include;..\..\..\..\module\ble;..\..\..\..\module\ble\prf;..\..\..\..\module\ble\ll;..\..\..\..\module\common;..\..\..\..\module\adpcm;..\..\..\..\module\calendar;..\..\..\..\peripheral\ecc;..\..\..\..\peripheral\api;..\..\..\..\peripheral\inc;..\..\..\..\soc\arm_cm;..\..\..\..\soc\arm_cm\cmsis;..\..\..\..\soc\arm_cm\le501x;..\..\..\..\soc\arm_cm\le501x\integration;..\..\..\..\soc;..\..\..\..;..;</IncludePath>
             </VariousControls>
           </Aads>
           <LDads>
@@ -410,6 +410,11 @@
               <FileName>async_call.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\module\common\async_call.c</FilePath>
+            </File>
+            <File>
+              <FileName>calendar.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\module\calendar\calendar.c</FilePath>
             </File>
             <File>
               <FileName>circular_doubly_linked_list.c</FileName>

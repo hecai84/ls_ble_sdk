@@ -84,7 +84,7 @@ static void alarm_resched(bool callback)
         struct sw_calendar_alarm *alarm = CONTAINER_OF(hdr,struct sw_calendar_alarm,hdr);
         time_t abs_time;
         get_current_internal_time(NULL,&abs_time);
-        if(abs_time - alarm->target>=0)
+        if(abs_time >= alarm->target)
         {
             cdll_pop_front(&alarm_list);
             if(callback) sw_calendar_alarm_callback(alarm);
