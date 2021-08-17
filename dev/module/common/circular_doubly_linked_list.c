@@ -98,8 +98,8 @@ ROM_SYMBOL void cdll_insert(struct cdll *list, struct cdll_hdr *hdr, bool (*cmp)
         hdr->prev = hdr;
         return;
     }
-    struct cdll_hdr *last = list->first->prev;
-    struct cdll_hdr *ptr = last;
+    bool inserted = false;
+    struct cdll_hdr *ptr = list->first->prev;
     do
     {
         if (cmp(hdr, ptr))
@@ -108,20 +108,20 @@ ROM_SYMBOL void cdll_insert(struct cdll *list, struct cdll_hdr *hdr, bool (*cmp)
             hdr->next = ptr->next;
             hdr->prev = ptr;
             ptr->next = hdr;
-            ptr = ptr->prev;
+            inserted = true;
             break;
         }
         else
         {
             ptr = ptr->prev;
         }
-    } while (ptr != last);
-    if (ptr == last)
+    } while (ptr != list->first->prev);
+    if (inserted == false)
     {
-        last->next = hdr;
-        list->first->prev = hdr;
+        ptr->next = hdr;
         hdr->next = list->first;
-        hdr->prev = last;
+        hdr->prev = ptr;
+        list->first->prev = hdr;
         list->first = hdr;
     }
 }
