@@ -3,81 +3,85 @@
 
 ROM_SYMBOL void cdll_init(struct cdll *list)
 {
-	list->first = NULL;
+    list->first = NULL;
 }
 
-ROM_SYMBOL void cdll_push_back(struct cdll *list,struct cdll_hdr *hdr)
+ROM_SYMBOL void cdll_push_back(struct cdll *list, struct cdll_hdr *hdr)
 {
-	if(list->first)
-	{
-		struct cdll_hdr *last = list->first->prev;
-		last->next = hdr;
-		hdr->prev = last;
-		hdr->next = list->first;
-		list->first->prev = hdr;
-	}else
-	{
-		list->first = hdr;
-		hdr->next = hdr;
-		hdr->prev = hdr;
-	}
+    if (list->first)
+    {
+        struct cdll_hdr *last = list->first->prev;
+        last->next = hdr;
+        hdr->prev = last;
+        hdr->next = list->first;
+        list->first->prev = hdr;
+    }
+    else
+    {
+        list->first = hdr;
+        hdr->next = hdr;
+        hdr->prev = hdr;
+    }
 }
 
 ROM_SYMBOL LL_PKT_ISR struct cdll_hdr *cdll_pop_front(struct cdll *list)
 {
-	if(list->first)
-	{
-		struct cdll_hdr *head = list->first;
-		if(head->next == head)
-		{
-			list->first = NULL;
-		}else
-		{
-			head->prev->next = head->next;
-			head->next->prev = head->prev;
-			list->first = head->next;
-		}
-		head->next = NULL;
-		head->prev = NULL;
-		return head;
-	}else
-	{
-		return NULL;	
-	}
+    if (list->first)
+    {
+        struct cdll_hdr *head = list->first;
+        if (head->next == head)
+        {
+            list->first = NULL;
+        }
+        else
+        {
+            head->prev->next = head->next;
+            head->next->prev = head->prev;
+            list->first = head->next;
+        }
+        head->next = NULL;
+        head->prev = NULL;
+        return head;
+    }
+    else
+    {
+        return NULL;
+    }
 }
 
-ROM_SYMBOL void cdll_extract(struct cdll *list,struct cdll_hdr *hdr)
+ROM_SYMBOL void cdll_extract(struct cdll *list, struct cdll_hdr *hdr)
 {
-	if(hdr->prev == hdr)
-	{
-		list->first = NULL;
-	}else
-	{
-		hdr->prev->next = hdr->next;
-		hdr->next->prev = hdr->prev;
-		if(list->first == hdr)
-		{
-			list->first = hdr->next;
-		}
-	}
-	hdr->next = NULL;
-	hdr->prev = NULL;
+    if (hdr->prev == hdr)
+    {
+        list->first = NULL;
+    }
+    else
+    {
+        hdr->prev->next = hdr->next;
+        hdr->next->prev = hdr->prev;
+        if (list->first == hdr)
+        {
+            list->first = hdr->next;
+        }
+    }
+    hdr->next = NULL;
+    hdr->prev = NULL;
 }
 
-ROM_SYMBOL void cdll_insert_before(struct cdll *list,struct cdll_hdr *ref_hdr,struct cdll_hdr *hdr_to_insert)
+ROM_SYMBOL void cdll_insert_before(struct cdll *list, struct cdll_hdr *ref_hdr, struct cdll_hdr *hdr_to_insert)
 {
     bool update_head = list->first == ref_hdr;
     ref_hdr->prev->next = hdr_to_insert;
     hdr_to_insert->prev = ref_hdr->prev;
     ref_hdr->prev = hdr_to_insert;
     hdr_to_insert->next = ref_hdr;
-    if(update_head)
+    if (update_head)
     {
         list->first = hdr_to_insert;
     }
 }
 
-ROM_SYMBOL void cdll_insert_after(struct cdll_hdr *ref_hdr,struct cdll_hdr *hdr_to_insert)
+ROM_SYMBOL void cdll_insert_after(struct cdll_hdr *ref_hdr, struct cdll_hdr *hdr_to_insert)
 {
     ref_hdr->next->prev = hdr_to_insert;
     hdr_to_insert->next = ref_hdr->next;
@@ -85,57 +89,59 @@ ROM_SYMBOL void cdll_insert_after(struct cdll_hdr *ref_hdr,struct cdll_hdr *hdr_
     hdr_to_insert->prev = ref_hdr;
 }
 
-ROM_SYMBOL void cdll_insert(struct cdll *list,struct cdll_hdr *hdr,bool (*cmp)(struct cdll_hdr *,struct cdll_hdr *))
+ROM_SYMBOL void cdll_insert(struct cdll *list, struct cdll_hdr *hdr, bool (*cmp)(struct cdll_hdr *, struct cdll_hdr *))
 {
-	if(list->first==NULL)
-	{
-		list->first = hdr;
-		hdr->next = hdr;
-		hdr->prev = hdr;
-		return;
-	}
-	struct cdll_hdr *ptr = list->first;
-	do{
-		if(cmp(hdr,ptr))
-		{
-			ptr->next->prev = hdr;
-			hdr->next = ptr->next;
-			hdr->prev = ptr;
-			ptr->next = hdr;
-			ptr = ptr->next;
-			break;
-		}else
-		{
-			ptr = ptr->next;
-		}
-	}while(ptr!=list->first);
-	if(ptr==list->first)
-	{
-		ptr->prev->next = hdr;
-		hdr->prev = ptr->prev;
-		hdr->next = ptr;
-		ptr->prev = hdr;
-		list->first = hdr;
-	}
+    if (list->first == NULL)
+    {
+        list->first = hdr;
+        hdr->next = hdr;
+        hdr->prev = hdr;
+        return;
+    }
+    struct cdll_hdr *last = list->first->prev;
+    struct cdll_hdr *ptr = last;
+    do
+    {
+        if (cmp(hdr, ptr))
+        {
+            ptr->next->prev = hdr;
+            hdr->next = ptr->next;
+            hdr->prev = ptr;
+            ptr->next = hdr;
+            ptr = ptr->prev;
+            break;
+        }
+        else
+        {
+            ptr = ptr->prev;
+        }
+    } while (ptr != last);
+    if (ptr == last)
+    {
+        last->next = hdr;
+        list->first->prev = hdr;
+        hdr->next = list->first;
+        hdr->prev = last;
+        list->first = hdr;
+    }
 }
 
 ROM_SYMBOL LL_PKT_ISR struct cdll_hdr *cdll_first(struct cdll *list)
 {
-	return list->first;
+    return list->first;
 }
 
 ROM_SYMBOL struct cdll_hdr *cdll_next(struct cdll_hdr *hdr)
 {
-	return hdr->next;
+    return hdr->next;
 }
 
 ROM_SYMBOL struct cdll_hdr *cdll_prev(struct cdll_hdr *hdr)
 {
-	return hdr->prev;
+    return hdr->prev;
 }
 
 ROM_SYMBOL bool cdll_is_elem_linked(struct cdll_hdr *hdr)
 {
-	return hdr->next&&hdr->prev ? true : false;
+    return hdr->next && hdr->prev ? true : false;
 }
-
