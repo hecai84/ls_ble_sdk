@@ -47,7 +47,6 @@ XIP_BANNED static void write_data_to_fifo(struct lsqspiv2_stg_cfg *cfg)
         }
     }
     while((LSQSPIV2->INTR_RAW&LSQSPIV2_INT_FSM_END_MASK)==0);
-    LSQSPIV2->INTR_CLR = LSQSPIV2_INT_FSM_END_MASK;
 }
 
 XIP_BANNED static void read_data_from_fifo(struct lsqspiv2_stg_cfg *cfg)
@@ -109,6 +108,7 @@ XIP_BANNED static void read_data_from_fifo(struct lsqspiv2_stg_cfg *cfg)
 
 XIP_BANNED void lsqspiv2_stg_read_write(struct lsqspiv2_stg_cfg *cfg)
 {
+    LSQSPIV2->INTR_CLR = LSQSPIV2_INT_FSM_END_MASK;
     REG_FIELD_WR(LSQSPIV2->QSPI_CTRL1,LSQSPIV2_MODE_DAC,0);
     uint32_t *ctrl = (uint32_t *)&cfg->ctrl;
     LSQSPIV2->STG_CTRL = *ctrl;
