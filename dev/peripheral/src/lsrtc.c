@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 #include "platform.h"
 #include "lsrtc.h"
@@ -125,6 +126,9 @@ HAL_StatusTypeDef RTC_CalendarGet(calendar_cal_t *calendar_cal, calendar_time_t 
     calendar_time->min = tm_ptr->tm_min;
     calendar_time->sec = tm_ptr->tm_sec;
     calendar_time->week = tm_ptr->tm_wday == 0 ? 7 : tm_ptr->tm_wday; // convert Sunday from 0 to 7
+    #ifdef __GNUC__
+    free(tm_ptr);
+    #endif
     #endif
     return result;
 }
