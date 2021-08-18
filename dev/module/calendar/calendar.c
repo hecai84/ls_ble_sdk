@@ -137,7 +137,9 @@ void sw_calendar_get_time(struct tm *timeptr)
     get_current_internal_time(NULL, &now);
     struct tm *ptr = localtime(&now);
     *timeptr = *ptr;
+    #ifdef __GNUC__
     free(ptr);
+    #endif
 }
 
 static bool alarm_compare(struct cdll_hdr *ptr,struct cdll_hdr *ref_hdr)
