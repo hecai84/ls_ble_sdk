@@ -119,6 +119,7 @@ XIP_BANNED void lsqspiv2_stg_read_write(struct lsqspiv2_stg_cfg *cfg)
     LSQSPIV2->STG_REQ_T = 1;
     if(cfg->dat_ctrl.dat_en == 0)
     {
+        while((LSQSPIV2->INTR_RAW&LSQSPIV2_INT_FSM_END_MASK)==0);
         return;
     }
     if(cfg->dat_ctrl.dat_dir == WRITE_TO_FLASH)
