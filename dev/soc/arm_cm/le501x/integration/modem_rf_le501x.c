@@ -10,9 +10,11 @@
 
 #define PLL_GAIN_CAL_FRQ_DIS0  20
 #define FLASH_SECURITY_AREA_INDEX_1 1
-#define SECURITY_AREA_PACKAGEID_OFFSET 0x24 
+#define SECURITY_AREA_PACKAGEID_OFFSET 0x24
+#define INVALID_POWER_VALUE 0xff 
 
 static uint16_t package_id=0;
+static uint8_t user_rf_power=INVALID_POWER_VALUE;
 
 uint8_t   pll_int_vtxd_ext;
 struct {
@@ -366,7 +368,7 @@ static void rf_reg_retention()
 
 void rf_set_power(uint8_t tx_power)
 {
-
+    user_rf_power = tx_power;
     if(tx_power == 0x10)
     {
         REG_FIELD_WR(RF->REG30,RF_PAHP_SEL,1);
@@ -390,6 +392,10 @@ void modem_rf_reinit()
 {
     rf_reg_init();
     modem_reg_init();
+    if (user_rf_power !=INVALID_POWER_VALUE)
+    {
+       rf_set_power(user_rf_power);
+    }
 }
 
 void modem_rf_init()
