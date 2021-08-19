@@ -169,7 +169,7 @@ bool timer_sleep()
             SLEEP_TIME = lsi_freq_update_and_hs_to_lpcycles(sleep_time) - 1;
         }else
         {
-            SLEEP_TIME = (sleep_time << 10)/100 - 1;
+            SLEEP_TIME = ((uint64_t)sleep_time << 10)/100 - 1;
         }
     }
     uint16_t cycles = SDK_LSI_USED ? us_to_lpcycles(wkup_delay_us) : 32768*wkup_delay_us/1000000;
