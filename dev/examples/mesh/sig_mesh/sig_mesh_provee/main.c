@@ -38,8 +38,8 @@ static uint8_t auth_data[16] = {0xF4,0xC7,0x0B,0xE8,0x10,0xE1,0x3A,0xAE,0xF8,0x3
 char ble_device_name[DEV_NAME_MAX_LEN] = "ls_sig_mesh_provee";
 uint8_t rsp_data_info[40] = {0};
 struct mesh_publish_info_ind mesh_publish_env[MAX_MESH_MODEL_NB];
-uint8_t model_tid = 0;
-uint8_t vendor_model_tid = 0;
+static uint8_t model_tid = 0;
+static uint8_t vendor_model_tid = 0;
 
 static uint16_t mesh_src_addr;
 static uint8_t adv_obj_hdl;
@@ -381,7 +381,7 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
         model_env.info[MODEL1_GENERIC_LEVEL_SVC].model_id = GENERIC_LVL_SERVER;
 
         model_env.info[MODEL2_VENDOR_MODEL_SVC].vendor_model_cfg_idx = MESH_MDL_CFG_VENDORS_INFO;
-        model_env.info[MODEL2_VENDOR_MODEL_SVC].element_id = 0;
+        model_env.info[MODEL2_VENDOR_MODEL_SVC].element_id = 1;
         model_env.info[MODEL2_VENDOR_MODEL_SVC].model_lid = 0;
         model_env.info[MODEL2_VENDOR_MODEL_SVC].vendor_model_role = 0; //sever model
         model_env.info[MODEL2_VENDOR_MODEL_SVC].model_id = VENDOR_USER_SERVER;
@@ -398,7 +398,7 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
         model_env.info[MODEL1_GENERIC_LEVEL_CLI].model_id = GENERIC_LVL_CLIENT;
 
         model_env.info[MODEL2_VENDOR_MODEL_CLI].vendor_model_cfg_idx = MESH_MDL_CFG_VENDORC_INFO;
-        model_env.info[MODEL2_VENDOR_MODEL_CLI].element_id = 0;
+        model_env.info[MODEL2_VENDOR_MODEL_CLI].element_id = 1;
         model_env.info[MODEL2_VENDOR_MODEL_CLI].model_lid = 0;
         model_env.info[MODEL2_VENDOR_MODEL_CLI].vendor_model_role = 1; //client model
         model_env.info[MODEL2_VENDOR_MODEL_CLI].model_id = VENDOR_USER_CLIENT;

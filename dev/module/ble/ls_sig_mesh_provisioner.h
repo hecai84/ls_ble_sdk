@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include "ls_ble.h"
 #include "ls_sig_mesh.h"
+
 #define __EMPTY
 
 #define UUID_MESH_DEV_LEN (16)
@@ -72,23 +73,129 @@ enum config_client_get_type
     CONFIG_CLIENT_GET_TYPE_MAX,
 };
 
+enum config_client_set_type
+{
+
+    CONFIG_CLIENT_SET_TYPE_BEACON = 0,
+
+    CONFIG_CLIENT_SET_TYPE_DFLT_TTL,
+    CONFIG_CLIENT_SET_TYPE_GATT_PROXY,
+    CONFIG_CLIENT_SET_TYPE_FRIEND,
+    CONFIG_CLIENT_SET_TYPE_RESET,
+    CONFIG_CLIENT_SET_TYPE_NET_TX,
+    CONFIG_CLIENT_SET_TYPE_RELAY,
+    CONFIG_CLIENT_SET_TYPE_MAX,
+};
+
+enum config_client_value_type
+{
+   CONFIG_CLIENT_GET_VAL_TYPE_BEACON = 0,
+   CONFIG_CLIENT_GET_VAL_TYPE_COMPO_DATA,
+   CONFIG_CLIENT_GET_VAL_TYPE_DFLT_TTL,
+   CONFIG_CLIENT_GET_VAL_TYPE_GATT_PROXY,
+   CONFIG_CLIENT_GET_VAL_TYPE_RELAY,
+   CONFIG_CLIENT_GET_VAL_TYPE_MDL_PUBLI,
+   CONFIG_CLIENT_GET_VAL_TYPE_MDL_SUBS,
+   CONFIG_CLIENT_GET_VAL_TYPE_MDL_SUBS_LIST,
+   CONFIG_CLIENT_GET_VAL_TYPE_NETKEY,
+   CONFIG_CLIENT_GET_VAL_TYPE_NETKEY_LIST,
+   CONFIG_CLIENT_GET_VAL_TYPE_APPKEY,
+   CONFIG_CLIENT_GET_VAL_TYPE_APPKEY_LIST,
+   CONFIG_CLIENT_GET_VAL_TYPE_NODE_IDENTITY,
+   CONFIG_CLIENT_GET_VAL_TYPE_MDL_APP,
+   CONFIG_CLIENT_GET_VAL_TYPE_MDL_APP_LIST,
+   CONFIG_CLIENT_GET_VAL_TYPE_NODE_RESET,
+   CONFIG_CLIENT_GET_VAL_TYPE_FRIEND,
+   CONFIG_CLIENT_GET_VAL_TYPE_PHASE,
+   CONFIG_CLIENT_GET_VAL_TYPE_HB_PUBLI,
+   CONFIG_CLIENT_GET_VAL_TYPE_HB_SUBS,
+   CONFIG_CLIENT_GET_VAL_TYPE_LPN_POLLTIMEOUT,
+   CONFIG_CLIENT_GET_VAL_TYPE_NET_TX,
+};
+
+enum config_client_net_action_type
+{
+    CONFIG_CLIEN_ADD_NET_KEY_TYPE = 0,
+    CONFIG_CLIEN_UPDATE_NET_KEY_TYPE,
+    CONFIG_CLIEN_DELETE_NET_TYPE,
+    CONFIG_CLIEN_GET_NET_KEY_BOUND_APP_KEY,
+    CONFIG_CLIEN_GET_NET_KEY_TYPE_NODE_ID,
+    CONFIG_CLIEN_GET_NET_KEY_TYPE_PHASE,
+    CONFIG_CLIEN_SET_NET_KEY_TYPE_PHASE,
+    CONFIG_CLIEN_SET_NET_KEY_TYPE_NODE_ID,
+    CONFIG_CLIEN_NET_KEY_TYPE_MAX,
+};
+
+enum config_client_app_action_type
+{
+    CONFIG_CLIENT_ADD_APP_KEY_TYPE= 0,
+    CONFIG_CLIENT_UPDATE_APP_KEY_TYPE,
+    CONFIG_CLIENT_DELETE_APP_KEY_TYPE,
+    CONFIG_CLIENT_ACTIVE_APP_TYPE_MAX,
+};
+
+enum config_client_mdl_get_type
+{
+    CONFIG_CLIENT_MDL_GET_TYPE_PUBLI = 0,
+    CONFIG_CLIENT_MDL_GET_TYPE_SUBS,
+    CONFIG_CLIENT_MDL_GET_TYPE_APP,
+    CONFIG_CLIENT_MDL_GET_TYPE_MAX,
+};
+
+enum config_client_mdl_subs_action_type
+{
+    CONFIG_CLIENT_MDL_SUBS_ACTION_TYPE_ADD = 0,
+    CONFIG_CLIENT_MDL_SUBS_ACTION_TYPE_DELETE,
+    CONFIG_CLIENT_MDL_SUBS_ACTION_TYPE_OVERWRITE,
+    CONFIG_CLIENT_MDL_SUBS_ACTION_TYPE_DELETE_ALL,
+    CONFIG_CLIENT_MDL_SUBS_ACTION_TYPE_MAX,
+};
+
+
+enum config_client_mdl_app_action_type
+{
+    CONFIG_CLIENT_MDL_APP_ACTION_TYPE_BIND,
+    CONFIG_CLIENT_MDL_APP_ACTION_TYPE_UNBIND,
+    CONFIG_CLIENT_MDL_APP_ACTION_TYPE_MAX,
+};
+
+enum config_client_mdl_publi_set_type
+{
+    CONFIG_CLIENT_MDL_PUBLI_SET_TYPE_ADDR,
+    CONFIG_CLIENT_MDL_PUBLI_SET_TYPE_VADDR,
+    CONFIG_CLIENT_MDL_PUBLI_SET_TYPE_MAX,
+};
+
 enum mesh_provisioner_evt_type
 {
-    MESH_PROVER_ACTIVE_ENABLE = 0,
-    MESH_PROVER_ACTIVE_DISABLE,
-    MESH_PROVER_ACTIVE_NODE_FOUND,
-    MESH_PROVER_ACTIVE_NODE_GATT,
-    MESH_PROVER_ACTIVE_NODE_STOPPED,
-    MESH_PROVER_ACTIVE_PROXY_SVC,
-    MESH_PROVER_ACTIVE_STATE,
-    MESH_PROVER_GET_PROV_AUTH_INFO,
+    MESH_PROVER_GET_PROV_AUTH_INFO = MESH_EVT_TYPE_MAX,
     MESH_PROVER_KEY_DEV_ADD_RSP_INFO,
     MESH_PROVER_KEY_NET_ADD_IND,
     MESH_PROVER_KEY_APP_ADD_IND,
     MESH_PROVER_HEALTH_MODEL_RSP_INFO,
     MESH_PROVER_SET_DEV_RSP_INFO,
     MESH_PROVER_IDENTIFY_REQ_IND_INFO,
+    MESH_PROVER_EVT_MAX,
+};
 
+enum mesh_provisioner_rx_ind_type
+{
+    MESH_PROVER_ACTIVE_NODE_FOUND=0,
+    MESH_PROVER_ACTIVE_NODE_GATT,
+    MESH_PROVER_ACTIVE_NODE_STOPPED,
+    MESH_PROVER_ACTIVE_PROXY_SVC,
+    MESH_PROVER_ACTIVE_STATE,
+    MESH_PROVER_CONFC_GET_BEACON_STATUS,
+    MESH_PROVER_CONFC_GET_DEFAULT_TTL_STATUS,
+    MESH_PROVER_CONFC_GET_GATT_PROXY_STATUS,
+    MESH_PROVER_CONFC_GET_FRIEND_STATUS,
+    MESH_PROVER_CONFC_MODEL_SUBS_STATUS,
+    MESH_PROVER_CONFC_MODEL_APP_STATUS,
+    MESH_PROVER_CONFC_COMP_DATA_PAGE0,
+    MESH_PROVER_CONFC_COMP_DATA_PAGE0_ELEMENT,
+    MESH_PROVER_CONFC_APP_KEY_STATUS,
+    MESH_PROVER_CONFC_NET_TX_STATUS,
+    MESH_PROVER_RX_IND_MAX,
 };
 
 enum prover_provisioning_state
@@ -109,6 +216,7 @@ struct prover_node_scan_info
 struct prover_active_state_info
 {
    uint8_t state;
+   uint16_t status;
    uint16_t unicast_addr;
 }__attribute__ ((packed));
 
@@ -145,34 +253,90 @@ struct prover_identify_req_ind_info
     uint16_t dev_in_oob_action;
 }__attribute__ ((packed));
 
+struct prover_confc_get_compo_data_ind_info
+{
+    uint16_t unicast_addr;
+    uint16_t company_id;
+    uint16_t product_id;
+    uint16_t version_id;
+    uint16_t min_num_replay;
+    uint16_t support_features;
+    uint8_t  dev_nb_elements;
+}__attribute__ ((packed));
 
-union ls_sig_mesh_provisioner_evt_u {
-  struct prover_node_scan_info prover_node_scan_info;
-  struct prover_active_state_info  prover_node_state_info;
+struct prover_confc_get_compo_data_element_ind_info
+{
+    uint16_t unicast_addr;
+    uint16_t loc_desc;
+    uint8_t  number_sig_models;
+    uint8_t  number_vendor_models;
+    uint32_t model_info[__EMPTY];
+}__attribute__ ((packed));
+
+struct prover_confc_get_default_ttl_ind_info
+{
+    uint16_t unicast_addr;
+    uint8_t  default_ttl;
+}__attribute__ ((packed));
+
+struct prover_confc_get_app_key_status_ind_info
+{
+    uint16_t unicast_addr;
+    uint8_t  active_status;
+    uint16_t net_key_id;
+    uint16_t app_key_id;
+}__attribute__ ((packed));
+
+struct prover_confc_model_subs_app_status_ind_info
+{
+    uint16_t unicast_addr;
+    uint8_t  status;
+    uint16_t element_addr;
+    uint32_t model_id;
+    uint16_t value; //group_addr/appkey_id
+
+}__attribute__ ((packed));
+
+union ls_sig_mesh_provisioner_evt_u 
+{
   struct prover_add_dev_key_rsp_info  prover_node_add_dev_key_rsp_info;
   struct prover_health_client_model_rsp_info prover_node_health_model_rsp_info;
   struct prover_add_net_key_ind_info prover_node_add_net_key_ind_info;
   struct prover_add_app_key_ind_info prover_node_add_app_key_ind_info;
   struct prover_identify_req_ind_info prover_identify_req_ind_info;
 };
+
+union ls_sig_mesh_provisioner_rx_info_u 
+{
+  struct prover_active_state_info  prover_node_state_info;
+  struct prover_node_scan_info prover_node_scan_info;
+  struct prover_confc_get_compo_data_ind_info confc_get_compo_data_info;
+  struct prover_confc_get_compo_data_element_ind_info confc_get_compo_data_element_info;
+  struct prover_confc_get_default_ttl_ind_info confc_get_default_ttl_info;
+  struct prover_confc_get_app_key_status_ind_info confc_get_app_key_status_info;
+  struct prover_confc_model_subs_app_status_ind_info confc_model_subs_app_status_info;
+};
+
 /**
  * @brief 
  * 
- * @param evt_cb 
+ * @param evt_cb
+ * @param rx_ind_handle
  */
-void prf_ls_sig_mesh_provisioner_callback_init(void (*evt_cb)(enum mesh_provisioner_evt_type, union ls_sig_mesh_provisioner_evt_u *));
+void prf_ls_sig_mesh_provisioner_callback_init(void (*evt_cb)(enum mesh_provisioner_evt_type, union ls_sig_mesh_provisioner_evt_u *),void (*rx_ind_handle)(enum mesh_provisioner_rx_ind_type, union ls_sig_mesh_provisioner_rx_info_u *));
 /**
  * @brief 
  * 
+ * @param unicast_addr
+ * @param dev_uuid
  */
-void ls_sig_mesh_provisioner_init(void);
+void ls_sig_mesh_add_uuid_unicast_addr(const uint16_t unicast_addr, const uint8_t* dev_uuid);
 /**
  * @brief 
  * 
- * @param address 
- * @param dev_key 
+ * @param unicast_addr provisioner unicast address
  */
-void ls_sig_mesh_provisioner_add_dev_key(const uint16_t address, const uint8_t* dev_key);
+void ls_sig_mesh_provisioner_init(uint16_t const unicast_addr);
 /**
  * @brief 
  * 
@@ -269,8 +433,9 @@ void ls_sig_mesh_identify_cfm(bool accept, uint8_t netkey_lid, uint16_t unicast_
 /**
  * @brief 
  * 
+ * @param primary_addr
  */
-void ls_sig_mesh_prover_config_reg_model(void);
+void ls_sig_mesh_prover_config_reg_model(uint16_t primary_addr);
 /**
  * @brief 
  * 
@@ -411,8 +576,7 @@ void ls_sig_mesh_prover_health_client_act_fault(uint16_t address, uint8_t appkey
  * 
  */
 void ls_sig_mesh_prover_health_client_reg_model(void);
-/**
- * @brief 
- * 
- */
+
+/** @} */
+
 #endif //(_LS_SIG_MESH_PROVISIONER_H_

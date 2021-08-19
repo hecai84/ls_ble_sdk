@@ -98,6 +98,7 @@ enum mesh_evt_type
     MESH_ACTIVE_GLP_START,
     MESH_ACTIVE_GLP_STOP,
     MESH_ACTIVE_AUTO_PROV,
+    MESH_EVT_TYPE_MAX,
 };
 
 /// Mesh Supported Features
@@ -500,40 +501,214 @@ struct bcn_start_unprov_param
     uint32_t UriHash;
     bool UriHash_Present;
 };
-
+/**
+ * @brief 
+ * 
+ * @param evt_cb
+ */
 void prf_ls_sig_mesh_callback_init(void (*evt_cb)(enum mesh_evt_type, union ls_sig_mesh_evt_u *));
+/**
+ * @brief 
+ * 
+ * @param sec_lvl
+ * @param cfg
+ */
 void dev_manager_prf_ls_sig_mesh_add(uint8_t sec_lvl, struct ls_sig_mesh_cfg *cfg);
+/**
+ * @brief 
+ * 
+ * @param param
+ */
 void ls_sig_mesh_init(struct mesh_model_info *param);
+/**
+ * @brief 
+ * 
+ */
 void ls_sig_mesh_platform_reset(void);
+/**
+ * @brief Set the prov param object
+ * 
+ * @param param
+ */
 void set_prov_param(struct mesh_prov_info *param);
+/**
+ * @brief Set the prov auth info object
+ * 
+ * @param param
+ */
 void set_prov_auth_info(struct mesh_prov_auth_info *param);
+/**
+ * @brief 
+ * 
+ * @param ModelHandle
+ * @param Addr
+ */
 void model_subscribe(uint8_t const ModelHandle, uint16_t const Addr);
+/**
+ * @brief 
+ * 
+ * @param ModelHandle
+ * @param add_list
+ * @param uuid_flag
+ */
 void model_get_subscribe_list(uint8_t  ModelHandle, uint8_t *add_list, bool uuid_flag);
+/**
+ * @brief 
+ * 
+ * @param ModelHandle
+ * @return uint16_t 
+ */
 uint16_t  model_get_subscribe_listSize(uint8_t  ModelHandle);
+/**
+ * @brief 
+ * 
+ * @param param
+ */
 void rsp_model_info_ind(struct rsp_model_info *param);
+/**
+ * @brief 
+ * 
+ * @param param
+ */
 void mesh_model_client_set_state_handler(struct model_cli_set_state_info *param);
+/**
+ * @brief 
+ * 
+ * @param param
+ */
 void mesh_model_client_tx_message_handler(struct model_cli_trans_info *param);
+/**
+ * @brief 
+ * 
+ * @param msg
+ */
 void mesh_vendor_model_publish_message(struct vendor_model_publish_message *msg);
+/**
+ * @brief 
+ * 
+ * @param TimerID
+ * @param DelayMS
+ */
 void TIMER_Set(uint8_t TimerID, uint32_t DelayMS);
+/**
+ * @brief 
+ * 
+ * @param TimerID
+ */
 void TIMER_Cancel(uint8_t TimerID);
+/**
+ * @brief 
+ * 
+ */
 void SIGMESH_UnbindAll(void);
+/**
+ * @brief 
+ * 
+ */
 void stop_tx_unprov_beacon(void);
+/**
+ * @brief 
+ * 
+ * @param param
+ */
 void start_tx_unprov_beacon(struct bcn_start_unprov_param *param);
+/**
+ * @brief 
+ * 
+ * @param scan_rsp_data
+ * @param scan_rsp_data_len
+ */
 void ls_sig_mesh_con_set_scan_rsp_data(uint8_t *scan_rsp_data, uint8_t *scan_rsp_data_len);
+/**
+ * @brief 
+ * 
+ */
 void app_mesh_enable_mesh(void);
+/**
+ * @brief 
+ * 
+ */
 void app_mesh_disable_mesh(void);
+/**
+ * @brief 
+ * 
+ */
 void start_ls_sig_mesh_gatt(void);
+/**
+ * @brief 
+ * 
+ */
 void stop_ls_sig_mesh_gatt(void);
+/**
+ * @brief 
+ * 
+ * @param enable
+ */
 void ls_sig_mesh_proxy_adv_ctl(uint8_t enable);
+/**
+ * @brief 
+ * 
+ * @param param
+ */
 void start_glp_handler(struct start_glp_info *param);
+/**
+ * @brief 
+ * 
+ */
 void stop_glp_handler(void);
+/**
+ * @brief 
+ * 
+ * @param param
+ */
 void start_lpn_handler(struct start_lpn_info *param);
+/**
+ * @brief 
+ * 
+ */
 void stop_lpn_handler(void);
+/**
+ * @brief 
+ * 
+ */
 void ls_sig_mesh_disable(void);
+/**
+ * @brief 
+ * 
+ */
 void ls_sig_mesh_enable(void);
+/**
+ * @brief 
+ * 
+ * @param friend_addr
+ */
 void lnp_select_friend_handler(uint16_t friend_addr);
+/**
+ * @brief 
+ * 
+ * @param param
+ * @param auto_prov_mesh_flag
+ */
 void ls_sig_mesh_auto_prov_handler(struct mesh_auto_prov_info const *param, bool const auto_prov_mesh_flag);
+/**
+ * @brief 
+ * 
+ * @param src
+ */
 void prov_succeed_src_addr_ind(uint16_t src);
+/**
+ * @brief 
+ * 
+ * @param interval_ms
+ */
 void ls_sig_mesh_set_proxy_con_interval(uint16_t *interval_ms);
+/**
+ * @brief 
+ * 
+ * @param interval_slot
+ */
 void ls_sig_mesh_set_pb_gatt_con_interval(uint16_t *interval_slot);
+
+/** @} */
+
 #endif //(_LS_SIG_MESH_H_

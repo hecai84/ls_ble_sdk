@@ -1,0 +1,11 @@
+Import('app_build')
+src = [
+    'main.c',
+    'at_sig_mesh_prover_recv_cmd.c',
+    'at_sig_mesh_prover_cmd_parse.c',
+    'at_sig_mesh_prover_cmd_ind.c',
+]
+inc = [
+    '.'
+]
+app_build('sig_mesh_provisioner',src,inc,mesh=True)

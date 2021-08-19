@@ -1,3 +1,4 @@
 Import('app_build')
 SConscript(dirs = 'sig_mesh_provee',exports=['app_build'])
 SConscript(dirs = 'sig_mesh_provee_auto_prov',exports=['app_build'])
+SConscript(dirs = 'sig_mesh_provisioner',exports=['app_build'])

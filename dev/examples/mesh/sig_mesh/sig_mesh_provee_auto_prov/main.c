@@ -47,8 +47,8 @@ uint8_t app_key[16] = {0x8E,0x40,0x71,0xA5,0x3F,0x7A,0xEA,0xF0,0x81,0xB9,0xCF,0x
 char ble_device_name[DEV_NAME_MAX_LEN] = "ls_sig_mesh_provee";
 uint8_t rsp_data_info[40] = {0};
 struct mesh_publish_info_ind mesh_publish_env[MAX_MESH_MODEL_NB];
-uint8_t model_tid = 0;
-uint8_t vendor_model_tid = 0;
+static uint8_t model_tid = 0;
+static uint8_t vendor_model_tid = 0;
 
 static uint16_t mesh_src_addr;
 static uint8_t adv_obj_hdl;
