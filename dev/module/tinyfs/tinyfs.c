@@ -769,7 +769,7 @@ static void tinyfs_list_init(tinyfs_list_t *env,uint16_t len)
     for(i=0;i<len;++i)
     {
         node_list_init(&env[i].list);
-        env->size = 0;
+        env[i].size = 0;
     }
 }
 
