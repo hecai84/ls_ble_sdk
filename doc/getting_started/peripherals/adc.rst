@@ -22,7 +22,7 @@ ADC特性：
 ADC系统框图如下：
 >>>>>>>>>>>>>>>>>>>>>
 
-..  image:: ADC框图.jpg
+..  image:: ADC_Diagram.jpg
 
 一、初始化
 --------------
