@@ -102,10 +102,10 @@ static void Handler_For_SW_Timer()
             total = lpcycles_to_hus(dur);
         }else
         {
-            error = (dur << 3) + dur + error;
-            total = error >> 8;
-            error = error - (total << 8);
-            total = 61 * dur + total;
+            total = (uint64_t)dur*1000000/16384;
+            error += (uint64_t)dur*1000000%16384;
+            total += error/16384;
+            error %= 16384;
         }
         TIME_CORR2 = 0x80000000 | total/625;
         TIME_CORR = 624 - (total - total/625*625);
