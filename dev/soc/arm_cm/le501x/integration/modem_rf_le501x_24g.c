@@ -155,7 +155,7 @@ static void rf_reg_init_24g(void)
                | FIELD_BUILD(RF_MIX_ENB_CAP,0);
    RF->REG08 = FIELD_BUILD(RF_LDO_RX_TRIM,4)
                | FIELD_BUILD(RF_LDO_TX_TRIM,4)
-               | FIELD_BUILD(RF_CF_BW12M_ADJ,0)
+               | FIELD_BUILD(RF_CF_BW12M_ADJ,1)
                | FIELD_BUILD(RF_TX_RATE,0)
                | FIELD_BUILD(RF_CF_BW08M_ADJ,0)
                | FIELD_BUILD(RF_TX_DATA_TST_EN,0)
@@ -458,3 +458,7 @@ void modem_rf_init_24g(void)
     pll_gain_24g(2400);
 }
 
+void modem_rf_set_rx_phy(uint8_t phy)
+{
+    REG_FIELD_WR(RF->REG08, RF_CF_BW12M_ADJ, phy);  
+}

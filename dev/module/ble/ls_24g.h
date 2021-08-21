@@ -32,6 +32,11 @@ enum prop_24g_tx_power_config
 
     TX_POWER_MAX = TX_POWER_12dbm + 1,
 };
+enum prop_24g_phy
+{
+    PROP_24G_PHY_1MBPS = 0,
+    PROP_24G_PHY_2MBPS
+};
 
 struct prop_24g_tx_rx_cntl_env
 {
@@ -50,6 +55,7 @@ void RF_24g_Init(void);
 // Only rx can be stopped!!!
 void RF_24g_Stop(void);
 void RF_24g_SetChannel(uint16_t channel);
+void RF_24g_SetPhy(uint8_t phy);
 uint16_t RF_24g_GetChannel(void);
 void RF_24g_SetPower(enum prop_24g_tx_power_config tx_pwr_config);
 enum prop_24g_status RF_24g_Tx(uint8_t *txBuf, uint8_t txLen, void (*Tx_cmpt_cb)(void *), void *param);

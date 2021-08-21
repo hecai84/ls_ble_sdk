@@ -3,5 +3,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 void modem_rf_init_24g(void);
+void modem_rf_set_rx_phy(uint8_t phy);
 #endif
 

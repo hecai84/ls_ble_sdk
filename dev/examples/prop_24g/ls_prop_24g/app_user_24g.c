@@ -11,6 +11,7 @@
 #define _ISR // The macro means the function will be called in interrupt.
 
 #define RF_CHANNEL_DEFAULT 2380
+#define RF_PHY_DEFAULT PROP_24G_PHY_1MBPS
 
 #define UART_SYNC_BYTE  0xA5
 #define UART_SYNC_BYTE_LEN 1
@@ -126,6 +127,7 @@ void app_user_24g_init(void)
     ls_uart_init();
     ls_uart_recv_restart();
     RF_24g_SetChannel(RF_CHANNEL_DEFAULT);
+    RF_24g_SetPhy(RF_PHY_DEFAULT);
     app_user_24g_rx();
 }
 
