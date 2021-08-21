@@ -11,3 +11,4 @@ if env['IC'] == 'le501x':
     SConscript(dirs = 'crypt',exports=['app_build'])
     SConscript(dirs = 'ssi',exports=['app_build'])
     SConscript(dirs = 'software_timers',exports=['app_build'])
+    SConscript(dirs = 'software_calendar',exports=['app_build'])

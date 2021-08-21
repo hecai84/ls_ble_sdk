@@ -28,7 +28,7 @@ __attribute((weak)) void (*ecc_calc_fn)(const uint8_t*,const uint8_t*,const uint
 __attribute((weak)) void (*exit_critical_fn)(uint32_t);
 __attribute((weak)) uint32_t (*enter_critical_fn)(void);
 __attribute((weak)) void (*stack_reset_hook_fn)(void);
-__attribute((weak)) uint32_t (*lpcycles_to_hus_fn)(uint32_t);
+__attribute((weak)) uint64_t (*lpcycles_to_hus_fn)(uint32_t);
 __attribute((weak)) uint32_t (*us_to_lpcycles_fn)(uint32_t);
 __attribute((weak)) uint32_t (*lsi_freq_update_and_hs_to_lpcycles_fn)(int32_t);
 __attribute((weak)) bool lsi_used;

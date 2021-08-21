@@ -199,9 +199,9 @@ void rco_freq_counting_start()
     LPTIM->CON1 |= 4;
 }
 
-uint32_t lpcycles_to_hus(uint32_t lpcycles)
+uint64_t lpcycles_to_hus(uint32_t lpcycles)
 {
-    uint32_t hus = 2*(uint64_t)lpcycles*lsi_cnt_val/LSI_CNT_CYCLES;
+    uint64_t hus = 2*(uint64_t)lpcycles*lsi_cnt_val/LSI_CNT_CYCLES;
     //LOG_I("%d,%d",lpcycles,hus);
     return hus;
 }
@@ -246,7 +246,7 @@ void lse_init(){}
 void rco_freq_counting_init(){}
 void rco_freq_counting_config(){}
 void rco_freq_counting_start(){}
-uint32_t lpcycles_to_hus(uint32_t lpcycles){return 0;}
+uint64_t lpcycles_to_hus(uint32_t lpcycles){return 0;}
 uint32_t us_to_lpcycles(uint32_t us){return 0;}
 uint32_t lsi_freq_update_and_hs_to_lpcycles(int32_t hs_cnt){return 0;}
 void rco_freq_counting_sync(){}

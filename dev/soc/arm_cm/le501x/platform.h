@@ -66,7 +66,7 @@ void rco_freq_counting_config(void);
 
 void rco_freq_counting_start(void);
 
-uint32_t lpcycles_to_hus(uint32_t lpcycles);
+uint64_t lpcycles_to_hus(uint32_t lpcycles);
 
 uint32_t us_to_lpcycles(uint32_t us);
 #if SDK_LSI_USED

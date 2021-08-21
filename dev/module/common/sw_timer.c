@@ -98,7 +98,8 @@ LL_EVT_ISR void sw_timer_isr()
             break;
         }
         struct sw_timer_env *timer = CONTAINER_OF(hdr,struct sw_timer_env,hdr);
-        if(timer_time_compare(timer_time_get(),timer->target)>=0)
+        sw_timer_time_t current = timer_time_get();
+        if(timer_time_compare(current,timer->target)>=0)
         {
             cdll_pop_front(&sw_timer_list);
             if(timer->callback(timer->cb_param))

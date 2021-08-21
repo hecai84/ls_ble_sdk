@@ -96,7 +96,7 @@ static void Handler_For_SW_Timer()
     {
         INT_CLR = 0x2;
         uint32_t dur = SLEEP_DUR;
-        uint32_t total;
+        uint64_t total;
         if(SDK_LSI_USED)
         {
             total = lpcycles_to_hus(dur);
