@@ -29,7 +29,7 @@ BLE_SINGLE_ROLE（单主/单从/一主一从串口透传）示例说明
 
 1.2 打开Scan/建立连接
 ++++++++++++++++++++++
-BLE相关的操作，作为主机，需要首先调用create_scan_obj()创建扫描对象。当scan object创建完成后，协议栈会产生一个SCAN_OBJ_CREATED消息，在这个消息的处理函数里，应用需要调用create_init_obj()再创建一个发起连接的object。在两个object都创建完成后，打开scan，扫描空中的广播数据。函数具体实现为：
+BLE相关的操作，作为主机，需要首先调用create_scan_obj()创建扫描对象。当scan object创建完成后，协议栈会产生一个SCAN_OBJ_CREATED消息，在这个消息的处理函数里，应用需要调用create_init_obj()再创建一个发起连接的对象。在两个对象都创建完成后，打开scan，扫描空中的广播数据。函数具体实现为：
 
 .. code ::
 
@@ -71,10 +71,15 @@ scan的参数比较多，重点解释一下与时间相关的参数，如下图�
 5、type表示scan类型，可以配置的选项解释如下：
 
 GENERAL_DISCOVERABLE：表示只能发现adv flag里有general_discovery或limited_discovery标志的广播包，同时该scan类型的duration实际为10.24秒，period为0
+
 LIMITED_DISCOVERABLE：表示只能发现adv flag里有limited_discovery标志的广播包，同时该scan类型的duration实际为10.24秒，period为0
+
 OBSERVER：表示最普通的scan，限制条件最少。除了受filter_duplicates的配置影响外，所有的adv包都会被接收
+
 OBSERVER_WHITELIST：表示只有在白名单里的设备发送的广播包才会被接收
+
 CONNECTABLE：表示只接收可连接广播包
+
 CONNECTABLE_WHITELIST：表示只接收在白名单里的可连接广播包
 
 6、active表示是否会发送scan request
@@ -106,13 +111,26 @@ CONNECTABLE_WHITELIST：表示只接收在白名单里的可连接广播包
     }
 
 其中scan_intv/scan_window的含义与scan的参数含义一致。
-conn_to：表示connection timeout，表示尝试连接的超时时间，以10ms为单位。设置为0表示没有超时时间
+
+conn_to：表示connection timeout，表示尝试连接的超时时间，以10ms为单位。设置为0表示没有超时时间。注意该参数只有在type为AUTO_CONNECTION_WHITELIST时才生效
+
+.. note ::
+
+    start_init里的type为DIRECT_CONNECTION时，假如需要对init行为增加timeout，需要使用额外的timer（比如builtin timer或外设timer），
+    在timeout触发时调用dev_manager_stop_init结束init行为
+
 conn_intv_min：表示最小连接间隔，以1.25ms为单位，容许的范围是7.5ms到4s
+
 conn_intv_max：表示最大连接间隔，以1.25ms为单位，容许的范围是7.5ms到4s
+
 conn_latency：表示slave latency，连接建立之后，slave可以连续不回应的事件个数
+
 supervision_to：表示supervision timeout，以10ms为单位，容许的范围是100ms到32s
+
 peer_add：表示待连接的设备地址
+
 peer_addr_type：表示待连接的设备地址类型，0表示public，1表示random
+
 type：表示连接类型。DIRECT_CONNECTION表示连接peer_addr和peer_addr_type指定的设备，AUTO_CONNECTION_WHITELIST表示主机会尝试与所有在白名单里的设备自动建立连接
 
 在建立连接成功之后，协议栈会产生一个GAP的CONNECTED消息到应用层，demo里会在这个消息里调用gatt_manager_client_mtu_exch_send()进行MTU交换，进而触发GATT层的后续行为。
