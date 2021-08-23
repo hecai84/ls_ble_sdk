@@ -11,6 +11,9 @@ void sw_calendar_alarm_callback(struct sw_calendar_alarm *param)
 {
     if(&alarm == param)
     {
+        static struct tm now;        
+        sw_calendar_get_time(&now);
+        io_toggle_pin(PA00);
         while(1);
     }
 }
@@ -29,11 +32,10 @@ int main()
     calendar_time.tm_min = 0;
     calendar_time.tm_sec = 0;
     sw_calendar_set_time(&calendar_time);
-    calendar_time.tm_min = 45;
+    calendar_time.tm_hour = 12;
     sw_calendar_set_alarm(&alarm,&calendar_time);
     while(1)
     {
         deep_sleep_no_ble();
-        io_toggle_pin(PA00);
     }
 }
