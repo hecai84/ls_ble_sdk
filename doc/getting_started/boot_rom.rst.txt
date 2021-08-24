@@ -37,12 +37,12 @@ UART MODE
  FLASH_READ_JEDEC_ID（0x10）
  FLASH_READ_UNIQUE_ID（0x11）
  FLASH_ERASE_SECURITY_AREA（0x12）               索引（1字节）
- FLASH_PROGRAM_SECURITY_AREA（0x13）             索引（1字节），地址（3字节），数据
- FLASH_READ_SECURITY_AREA（0x14）                索引（1字节），地址（3字节）
+ FLASH_PROGRAM_SECURITY_AREA（0x13）             地址（3字节），索引（1字节），长度（4字节），数据
+ FLASH_READ_SECURITY_AREA（0x14）                地址（3字节），索引（1字节），长度（4字节）
  FLASH_SOFTWARE_RESET（0x15）                    
  MEM32_WRITE_MULTI（0x16）                       数量（1字节），{地址（4字节），数据（4字节）}*数量
  FLASH_DUAL_IO_READ（0x17）                      偏移（4字节），长度（4字节）
- FLASH_DUAL_PAGE_PROGRAM（0x18）                 偏移（4字节），长度（4字节）
+ FLASH_DUAL_PAGE_PROGRAM（0x18）                 偏移（4字节），长度（4字节），数据
  FLASH INIT (0X19)                               配置字 00 双线 01 四线
 
 每条命令执行后，芯片都会响应，响应数据格式如下：

@@ -2,7 +2,7 @@
 #define REG_RF_TYPE_H_
 #include <stdint.h>
 
-#define RF ((reg_rf_t *)0x5000D000)
+#define RF ((reg_rf_t *)0x50018000)
 
 typedef struct
 {

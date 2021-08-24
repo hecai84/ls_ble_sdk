@@ -47,6 +47,7 @@ elif ic== 'gemini' :
     sbl_code_length = len(sbl_data)
     sbl_code_start = flash_base+code_offset
     sbl_code_exec_addr = 0x20001000
+    uart_cmd_mask = 0xffffffff
     feature_mask = 0xffffffff
     data_storage_base = 0x802000
     data_storage_size = 0x3000
@@ -54,7 +55,7 @@ elif ic== 'gemini' :
     app_image_base = 0x805000
     assert(app_image_base >= data_storage_base + data_storage_size)
     fota_image_base = 0x83d000
-    info_head = struct.pack('IIIIIIIII',test_word0,test_word1,code_offset,sbl_code_length,sbl_code_exec_addr,feature_mask,data_storage_base,app_image_base,fota_image_base)  
+    info_head = struct.pack('IIIIIIIIII',test_word0,test_word1,code_offset,sbl_code_length,sbl_code_exec_addr,uart_cmd_mask,feature_mask,data_storage_base,app_image_base,fota_image_base)  
 
 mac_addr_base = flash_base + 0x30
 mac_addr = bytes([0xff,0xff,0xff,0xff,0xff,0xff]) # ff:ff:ff:ff:ff:ff is not a valid address
