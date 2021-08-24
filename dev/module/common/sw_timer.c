@@ -39,23 +39,38 @@ static bool insertion_compare(struct cdll_hdr *ptr,struct cdll_hdr *ref_hdr)
     return timer_time_compare(insert->target,ref->target)>=0;
 }
 
-void sw_timer_update()
-{
-    struct cdll_hdr *hdr = cdll_first(&sw_timer_list);
-    if(hdr)
-    {
-        struct sw_timer_env *first = CONTAINER_OF(hdr,struct sw_timer_env,hdr);
-        timer_irq_clr();
-        timer_match_set(first->target);
-        sw_timer_time_t current = timer_time_get();
-        LS_ASSERT(timer_time_compare(current,first->target)<0);
-        timer_irq_unmask();
-    }
-}
-
 static void timer_insert(struct sw_timer_env *timer)
 {
     cdll_insert(&sw_timer_list,&timer->hdr,insertion_compare);
+}
+
+void sw_timer_update()
+{
+    while(1)
+    {
+        struct cdll_hdr *hdr = cdll_first(&sw_timer_list);
+        if(hdr == NULL)
+        {
+            break;
+        }
+        struct sw_timer_env *timer = CONTAINER_OF(hdr,struct sw_timer_env,hdr);
+        timer_irq_clr();
+        timer_match_set(timer->target);
+        sw_timer_time_t current = timer_time_get();
+        if(timer_time_compare(current,timer->target)>=0)
+        {
+            cdll_pop_front(&sw_timer_list);
+            if(timer->callback(timer->cb_param))
+            {
+                timer->target = timer_time_add(timer->target,timer->period);
+                timer_insert(timer);
+            }
+        }else
+        {
+            timer_irq_unmask();
+            break;
+        }
+    }
 }
 
 void sw_timer_insert(struct sw_timer_env *timer)
@@ -90,28 +105,6 @@ bool sw_timer_active(struct sw_timer_env *timer)
 LL_EVT_ISR void sw_timer_isr()
 {
     timer_irq_mask();
-    while(1)
-    {
-        struct cdll_hdr *hdr = cdll_first(&sw_timer_list);
-        if(hdr == NULL)
-        {
-            break;
-        }
-        struct sw_timer_env *timer = CONTAINER_OF(hdr,struct sw_timer_env,hdr);
-        sw_timer_time_t current = timer_time_get();
-        if(timer_time_compare(current,timer->target)>=0)
-        {
-            cdll_pop_front(&sw_timer_list);
-            if(timer->callback(timer->cb_param))
-            {
-                timer->target = timer_time_add(timer->target,timer->period);
-                timer_insert(timer);
-            }
-        }else
-        {
-            break;
-        }
-    }
     sw_timer_update();
 }
 
@@ -119,7 +112,6 @@ struct sw_timer_env *sw_timer_list_pick()
 {
     struct cdll_hdr *hdr = cdll_first(&sw_timer_list);
     return hdr ? CONTAINER_OF(hdr,struct sw_timer_env,hdr) : NULL;
-
 }
 
 void sw_timer_module_init(void)

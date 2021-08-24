@@ -15,13 +15,6 @@ static struct cdll alarm_list;
 static time_t time_base;
 static sw_timer_time_t timer_count;
 
-static bool calendar_base_timer_callback(void *param)
-{
-    time_base += SW_CALENDAR_BASE_TIMER_PERIOD_MS/1000;
-    timer_count = sw_timer_target_get(&calendar_base_timer);
-    return true;
-}
-
 __attribute__((weak)) void sw_calendar_alarm_callback(struct sw_calendar_alarm *alarm){}
 
 static void get_current_internal_time(sw_timer_time_t *sw_timer_time,time_t *abs_time)
@@ -94,13 +87,20 @@ static void alarm_resched(bool callback)
         }
     }
     alarm_update();
-
 }
 
 static bool alarm_callback(void *param)
 {
     alarm_resched(true);
     return false;
+}
+
+static bool calendar_base_timer_callback(void *param)
+{
+    time_base += SW_CALENDAR_BASE_TIMER_PERIOD_MS/1000;
+    timer_count = sw_timer_target_get(&calendar_base_timer);
+    alarm_resched(true);
+    return true;
 }
 
 void sw_calendar_init()
