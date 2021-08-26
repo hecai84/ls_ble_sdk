@@ -92,13 +92,13 @@ XIP_BANNED static void read_data_from_fifo(struct lsqspiv2_stg_cfg *cfg)
         switch(end - (uint8_t *)rx_ptr)
         {
         case 3:
-            *tail++ = rx;
+            tail[2] = rx>>16;
         //no break;
         case 2:
-            *tail++ = rx>>8;
+            tail[1] = rx>>8;
         //no break;
         case 1:
-            *tail++ = rx>>16;
+            tail[0] = rx;
         //no break;
         default:
         break;

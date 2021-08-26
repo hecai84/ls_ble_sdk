@@ -19,10 +19,8 @@ src = [
     'tinyfs/tinyfs.c',
     'tinycrypt/lib/source/sha256.c',
     'tinycrypt/lib/source/utils.c',
-    'tinycrypt/lib/source/ecc.c',
-    'tinycrypt/lib/source/ecc_dsa.c',
-    'tinycrypt/lib/source/ecc_platform_specific.c',
     'adpcm/adpcm.c',
+    'micro-ecc/uECC.c',
 ]
 
 if env['IC'] != 'le501x' and env['IC'] != 'gemini':
@@ -41,6 +39,7 @@ inc = [
     'common',
     'adpcm',
     'calendar',
+    'micro-ecc',
 ]
 src_files = File(env.subst(src))
 inc_dirs = Dir(inc)

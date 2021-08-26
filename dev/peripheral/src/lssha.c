@@ -42,7 +42,7 @@ static void sha256_start(const uint8_t *data,uint32_t length,uint32_t sha256[SHA
         block = length / SHA_BLOCK_SIZE + 1;
     }
     sha_padding_length = block * SHA_BLOCK_SIZE - length - SHA_DATA_LENGTH_SIZE;
-    LSSHA->SHA_CTRL = FIELD_BUILD(SHA_FST_DAT,1)|FIELD_BUILD(SHA_CALC_SHA224,0)|FIELD_BUILD(SHA_CALC_SM3,0)|FIELD_BUILD(SHA_SHA_LEN,block);
+    LSSHA->SHA_CTRL = FIELD_BUILD(SHA_FST_DAT,1)|FIELD_BUILD(SHA_CALC_SHA224,0)|FIELD_BUILD(SHA_CALC_SM3,0)|FIELD_BUILD(SHA_SHA_LEN,block - 1);
     LSSHA->SHA_START = 1;
 }
 
@@ -61,6 +61,7 @@ static void sha_data_config()
             LSSHA->FIFO_DAT = get_uint32_t(sha_data_ptr);
             sha_data_ptr += sizeof(uint32_t);
         }
+        sha_remain_length -= SHA_BLOCK_SIZE;
     }else
     {
         bool last = sha_padding_length<=SHA_PADDING_MOD;
@@ -68,20 +69,25 @@ static void sha_data_config()
         {
             LSSHA->FIFO_DAT = get_uint32_t(sha_data_ptr);
             sha_data_ptr += sizeof(uint32_t);
+            sha_remain_length -= sizeof(uint32_t);
         }
         switch(sha_remain_length)
         {
         case 3:
-            LSSHA->FIFO_DAT = sha_data_ptr[2]<<16|sha_data_ptr[1]<<8|sha_data_ptr[0];
+            LSSHA->FIFO_DAT = 0x80<<24|sha_data_ptr[2]<<16|sha_data_ptr[1]<<8|sha_data_ptr[0];
             sha_padding_length -= 1;
         break;
         case 2:
-            LSSHA->FIFO_DAT = sha_data_ptr[1]<<8|sha_data_ptr[0];
+            LSSHA->FIFO_DAT = 0x80<<16|sha_data_ptr[1]<<8|sha_data_ptr[0];
             sha_padding_length -= 2;
         break;
         case 1:
-            LSSHA->FIFO_DAT = sha_data_ptr[0];
+            LSSHA->FIFO_DAT = 0x80<<8|sha_data_ptr[0];
             sha_padding_length -= 3;
+        break;
+        case 0:
+            LSSHA->FIFO_DAT = 0x80;
+            sha_padding_length -= 4;
         break;
         }
         sha_remain_length = 0;
