@@ -12,7 +12,7 @@ static uint32_t sha_data_bits;
 static uint32_t sha_remain_length;
 static uint32_t *sha_rslt;
 static uint16_t sha_padding_length;
-
+static bool padding_started;
 HAL_StatusTypeDef HAL_LSSHA_Init(void)
 {
     HAL_LSSHA_MSP_Init();
@@ -34,7 +34,7 @@ static void sha256_start(const uint8_t *data,uint32_t length,uint32_t sha256[SHA
     sha_remain_length = length;
     sha_rslt = sha256;
     uint16_t block;
-    if(length % SHA_BLOCK_SIZE > SHA_PADDING_MOD)
+    if(length % SHA_BLOCK_SIZE > SHA_PADDING_MOD - 1)
     {
         block = length / SHA_BLOCK_SIZE + 2;
     }else
@@ -42,6 +42,7 @@ static void sha256_start(const uint8_t *data,uint32_t length,uint32_t sha256[SHA
         block = length / SHA_BLOCK_SIZE + 1;
     }
     sha_padding_length = block * SHA_BLOCK_SIZE - length - SHA_DATA_LENGTH_SIZE;
+    padding_started = false;
     LSSHA->SHA_CTRL = FIELD_BUILD(SHA_FST_DAT,1)|FIELD_BUILD(SHA_CALC_SHA224,0)|FIELD_BUILD(SHA_CALC_SM3,0)|FIELD_BUILD(SHA_SHA_LEN,block - 1);
     LSSHA->SHA_START = 1;
 }
@@ -65,32 +66,36 @@ static void sha_data_config()
     }else
     {
         bool last = sha_padding_length<=SHA_PADDING_MOD;
-        while(sha_remain_length>=sizeof(uint32_t))
+        if(padding_started==false)
         {
-            LSSHA->FIFO_DAT = get_uint32_t(sha_data_ptr);
-            sha_data_ptr += sizeof(uint32_t);
-            sha_remain_length -= sizeof(uint32_t);
+            while(sha_remain_length>=sizeof(uint32_t))
+            {
+                LSSHA->FIFO_DAT = get_uint32_t(sha_data_ptr);
+                sha_data_ptr += sizeof(uint32_t);
+                sha_remain_length -= sizeof(uint32_t);
+            }
+            switch(sha_remain_length)
+            {
+            case 3:
+                LSSHA->FIFO_DAT = 0x80<<24|sha_data_ptr[2]<<16|sha_data_ptr[1]<<8|sha_data_ptr[0];
+                sha_padding_length -= 1;
+            break;
+            case 2:
+                LSSHA->FIFO_DAT = 0x80<<16|sha_data_ptr[1]<<8|sha_data_ptr[0];
+                sha_padding_length -= 2;
+            break;
+            case 1:
+                LSSHA->FIFO_DAT = 0x80<<8|sha_data_ptr[0];
+                sha_padding_length -= 3;
+            break;
+            case 0:
+                LSSHA->FIFO_DAT = 0x80;
+                sha_padding_length -= 4;
+            break;
+            }
+            sha_remain_length = 0;
+            padding_started = true;
         }
-        switch(sha_remain_length)
-        {
-        case 3:
-            LSSHA->FIFO_DAT = 0x80<<24|sha_data_ptr[2]<<16|sha_data_ptr[1]<<8|sha_data_ptr[0];
-            sha_padding_length -= 1;
-        break;
-        case 2:
-            LSSHA->FIFO_DAT = 0x80<<16|sha_data_ptr[1]<<8|sha_data_ptr[0];
-            sha_padding_length -= 2;
-        break;
-        case 1:
-            LSSHA->FIFO_DAT = 0x80<<8|sha_data_ptr[0];
-            sha_padding_length -= 3;
-        break;
-        case 0:
-            LSSHA->FIFO_DAT = 0x80;
-            sha_padding_length -= 4;
-        break;
-        }
-        sha_remain_length = 0;
         LS_ASSERT(sha_padding_length%4==0);
         if(last)
         {
@@ -107,18 +112,12 @@ static void sha_data_config()
             }
         }else
         {
-            switch(sha_padding_length)
+            LS_ASSERT(sha_padding_length%sizeof(uint32_t)==0);
+            LS_ASSERT(sha_padding_length <= SHA_BLOCK_SIZE - sizeof(uint32_t));
+            if(sha_padding_length == SHA_BLOCK_SIZE - sizeof(uint32_t))
             {
-            case SHA_BLOCK_SIZE:
-                LSSHA->FIFO_DAT = 0;
-            //no break;
-            case SHA_BLOCK_SIZE - sizeof(uint32_t):
                 LSSHA->FIFO_DAT = 0;
                 sha_padding_length = SHA_PADDING_MOD;
-            break;
-            default:
-                LS_ASSERT(0);
-            break;
             }
         }
     }
@@ -143,10 +142,12 @@ static bool sha_continue()
 
 static void sha_rslt_copy()
 {
-    struct sha256_rslt{
-        uint32_t sha256[SHA256_WORDS_NUM];
-    };
-    *(struct sha256_rslt *)sha_rslt = *(struct sha256_rslt *)LSSHA->SHA_RSLT;
+    uint8_t i;
+    for(i=0;i<8;++i)
+    {
+        uint32_t val = LSSHA->SHA_RSLT[i];
+        sha_rslt[i] = val<<24| (val<<8&0xff0000) | (val>>8&0xff00) | val>>24;
+    }
     LSSHA->INTR_C = SHA_FSM_END_INTR_MASK;
 }
 
