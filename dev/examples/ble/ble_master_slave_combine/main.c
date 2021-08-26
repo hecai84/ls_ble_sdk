@@ -117,6 +117,7 @@ static uint8_t uart_state = UART_IDLE;
 static bool uart_tx_busy;
 static uint8_t current_uart_tx_idx; // bit7 = 1 : client, bit7 = 0 : server
 static uint8_t *next_connect_addr;
+static uint8_t dev_addr_type = 0;       /*  0:Public, 1:Private */
 static struct gatt_svc_env ls_uart_server_svc_env;
 // static uint8_t connected_num = 0; 
 static uint8_t uart_server_connected_num = 0;
@@ -790,7 +791,7 @@ static void start_init(uint8_t *peer_addr)
         .supervision_to = 200,
 
         .peer_addr = &peer_dev_addr_str,
-        .peer_addr_type = 0,
+        .peer_addr_type = dev_addr_type,
         .type = DIRECT_CONNECTION,
     };
     dev_manager_start_init(init_obj_hdl,&init_param);
@@ -883,25 +884,28 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
         #endif
         if (!memcmp(peer_slave_addr0, evt->adv_report.adv_addr->addr, BLE_ADDR_LEN))
         {
-            if (init_obj_hdl != 0xff && init_status == INIT_IDLE)
+            if (init_obj_hdl != 0xff && init_status == INIT_IDLE && next_connect_addr == 0)
             {
                 next_connect_addr = (uint8_t*)&peer_slave_addr0[0];
+                dev_addr_type = evt->adv_report.adv_addr_type;
                 dev_manager_stop_scan(scan_obj_hdl);
             }   
         }
         else if (!memcmp(peer_slave_addr1, evt->adv_report.adv_addr->addr, BLE_ADDR_LEN))
         {
-            if (init_obj_hdl != 0xff && init_status == INIT_IDLE)
+            if (init_obj_hdl != 0xff && init_status == INIT_IDLE && next_connect_addr == 0)
             {
                 next_connect_addr = (uint8_t*)&peer_slave_addr1[0];
+                dev_addr_type = evt->adv_report.adv_addr_type;
                 dev_manager_stop_scan(scan_obj_hdl);
             }   
         }
         else if (!memcmp(peer_slave_addr2, evt->adv_report.adv_addr->addr, BLE_ADDR_LEN))
         {
-            if (init_obj_hdl != 0xff && init_status == INIT_IDLE)
+            if (init_obj_hdl != 0xff && init_status == INIT_IDLE && next_connect_addr == 0)
             {
                 next_connect_addr = (uint8_t*)&peer_slave_addr2[0];
+                dev_addr_type = evt->adv_report.adv_addr_type;
                 dev_manager_stop_scan(scan_obj_hdl);
             }   
         }
