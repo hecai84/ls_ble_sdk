@@ -29,6 +29,7 @@ elif env['IC'] == 'gemini':
     'src/lsqspiv2.c',
     'src/spi_flash_lsqspiv2.c',
     'src/lssha.c',
+    'src/lscrc.c',
     ]
 else:
     src += [

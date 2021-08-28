@@ -36,6 +36,8 @@ void rand_gen_by_word(uint8_t *ptr,uint8_t word_num);
 
 void memcpy32(uint32_t *dest, const uint32_t *src, uint32_t size_word);
 
+void memset32(uint32_t *start,uint32_t data,uint32_t size_word);
+
 uint8_t count_trailing_zeros(uint32_t x);
 
 uint8_t count_leading_zeros(uint32_t x);

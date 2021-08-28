@@ -22,6 +22,14 @@ ROM_SYMBOL void memcpy32(uint32_t *dest, const uint32_t *src, uint32_t size_word
     }
 }
 
+ROM_SYMBOL void memset32(uint32_t *start,uint32_t data,uint32_t size_word)
+{
+    while(size_word--)
+    {
+        *start++ = data;
+    }
+}
+
 ROM_SYMBOL LL_PKT_ISR uint8_t count_trailing_zeros(uint32_t x)
 {
     uint32_t i;

@@ -12,7 +12,7 @@ static uint32_t sha_data_bits;
 static uint32_t sha_remain_length;
 static uint32_t *sha_rslt;
 static uint16_t sha_padding_length;
-static bool padding_started;
+static bool sha_padding_started;
 HAL_StatusTypeDef HAL_LSSHA_Init(void)
 {
     HAL_LSSHA_MSP_Init();
@@ -42,7 +42,7 @@ static void sha256_start(const uint8_t *data,uint32_t length,uint32_t sha256[SHA
         block = length / SHA_BLOCK_SIZE + 1;
     }
     sha_padding_length = block * SHA_BLOCK_SIZE - length - SHA_DATA_LENGTH_SIZE;
-    padding_started = false;
+    sha_padding_started = false;
     LSSHA->SHA_CTRL = FIELD_BUILD(SHA_FST_DAT,1)|FIELD_BUILD(SHA_CALC_SHA224,0)|FIELD_BUILD(SHA_CALC_SM3,0)|FIELD_BUILD(SHA_SHA_LEN,block - 1);
     LSSHA->SHA_START = 1;
 }
@@ -66,7 +66,7 @@ static void sha_data_config()
     }else
     {
         bool last = sha_padding_length<=SHA_PADDING_MOD;
-        if(padding_started==false)
+        if(sha_padding_started==false)
         {
             while(sha_remain_length>=sizeof(uint32_t))
             {
@@ -94,7 +94,7 @@ static void sha_data_config()
             break;
             }
             sha_remain_length = 0;
-            padding_started = true;
+            sha_padding_started = true;
         }
         LS_ASSERT(sha_padding_length%4==0);
         if(last)
