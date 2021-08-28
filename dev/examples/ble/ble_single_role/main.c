@@ -10,6 +10,7 @@
 #include <string.h>
 #include "co_math.h"
 #include "io_config.h"
+#include "ble_common_api.h"
 
 #define SLAVE_SERVER_ROLE 1
 #define MASTER_CLIENT_ROLE 1
@@ -165,7 +166,8 @@ enum scan_status
     SCAN_BUSY,
 };
 
-static const uint8_t peer_slave_addr0[BLE_ADDR_LEN] = {0x01,0xcc,0xcc,0xcc,0xcc,0xcc};
+static struct dev_addr specified_slave_addr;
+// static const uint8_t peer_slave_addr0[BLE_ADDR_LEN] = {0x01,0xcc,0xcc,0xcc,0xcc,0xcc};
 static uint8_t con_idx_client;
 static bool uart_client_wr_cmd_done;
 static uint16_t uart_client_mtu;
@@ -845,6 +847,7 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
         }
     break;
     case ADV_REPORT:
+    {
         #if 0
         LOG_I("adv received, addr: %2x:%2x:%2x:%2x:%2x:%2x", evt->adv_report.adv_addr->addr[5],
                                                        evt->adv_report.adv_addr->addr[4],
@@ -853,15 +856,23 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
                                                        evt->adv_report.adv_addr->addr[1],
                                                        evt->adv_report.adv_addr->addr[0]);
         #endif
-        if (!memcmp(peer_slave_addr0, evt->adv_report.adv_addr->addr, BLE_ADDR_LEN))
+        // if (!memcmp(peer_slave_addr0, evt->adv_report.adv_addr->addr, BLE_ADDR_LEN))
+        struct adv_payload_struct adv_data_name;
+        if (dev_manager_adv_report_parse(GAP_ADV_TYPE_SHORTENED_NAME, &evt->adv_report, &adv_data_name))
         {
-            if (init_obj_hdl != 0xff && init_status == INIT_IDLE)
+            if (adv_data_name.size == sizeof(UART_SVC_ADV_NAME) &&
+                0 == memcmp((void*)adv_data_name.p_data, UART_SVC_ADV_NAME, sizeof(UART_SVC_ADV_NAME)))
             {
-                dev_addr_type = evt->adv_report.adv_addr_type;
-                next_connect_addr = (uint8_t*)&peer_slave_addr0[0];
-                dev_manager_stop_scan(scan_obj_hdl);
-            }   
+                if (init_obj_hdl != 0xff && init_status == INIT_IDLE)
+                {
+                    dev_addr_type = evt->adv_report.adv_addr_type;
+                    memcpy((void*)&specified_slave_addr.addr[0], (void*)&evt->adv_report.adv_addr->addr[0], BLE_ADDR_LEN);
+                    next_connect_addr = &specified_slave_addr.addr[0];
+                    dev_manager_stop_scan(scan_obj_hdl);
+                }  
+            }
         }
+    }
     break;
     case INIT_OBJ_CREATED:
         LOG_I("init obj created");

@@ -21,6 +21,7 @@ src = [
     'tinycrypt/lib/source/utils.c',
     'adpcm/adpcm.c',
     'micro-ecc/uECC.c',
+    'ble/ble_common_api.c',
 ]
 
 if env['IC'] != 'le501x' and env['IC'] != 'gemini':

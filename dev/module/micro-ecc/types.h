@@ -8,9 +8,9 @@
         #define uECC_PLATFORM uECC_avr
     #elif defined(__thumb2__) || defined(_M_ARMT) /* I think MSVC only supports Thumb-2 targets */
         #define uECC_PLATFORM uECC_arm_thumb2
-    #elif defined(__thumb__)
+    #elif defined(__thumb__) && !defined (__CC_ARM)
         #define uECC_PLATFORM uECC_arm_thumb
-    #elif defined(__arm__) || defined(_M_ARM)
+    #elif (defined(__arm__) || defined(_M_ARM)) && !defined (__CC_ARM)
         #define uECC_PLATFORM uECC_arm
     #elif defined(__aarch64__)
         #define uECC_PLATFORM uECC_arm64
