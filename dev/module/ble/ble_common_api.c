@@ -1,4 +1,3 @@
-#include "le501x.h"
 #include "ble_common_api.h"
 
 bool dev_manager_adv_report_parse(uint8_t type, const struct adv_report_evt* adv_report, struct adv_payload_struct* typedata)
