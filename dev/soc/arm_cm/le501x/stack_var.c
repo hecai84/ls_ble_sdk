@@ -8,7 +8,7 @@
 #define ENV_BUF_SIZE 2048
 #if CONFIG_AOS
 #define DB_BUF_SIZE 0
-#define MSG_BUF_SIZE 2132
+#define MSG_BUF_SIZE 1900
 #define NON_RET_BUF_SIZE (12)
 #else
 #define DB_BUF_SIZE 8192
@@ -242,6 +242,14 @@ void ll_stack_var_ptr_init()
     enter_critical_fn = enter_critical;
     exit_critical_fn = exit_critical;
     stack_reset_hook_fn = ll_stack_reset_hook;
+    lpcycles_to_hus_fn = lpcycles_to_hus;
+    us_to_lpcycles_fn = us_to_lpcycles;
+    lsi_freq_update_and_hs_to_lpcycles_fn = lsi_freq_update_and_hs_to_lpcycles;
+    #if SDK_LSI_USED
+    lsi_used = true;
+    #else
+    lsi_used = false;
+    #endif
 
     max_activity_num = SDK_MAX_ACT_NUM;
     max_ral_num = SDK_MAX_RAL_NUM;

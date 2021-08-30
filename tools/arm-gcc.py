@@ -12,7 +12,7 @@ def generate(env):
     env['CC'] = 'arm-none-eabi-gcc'
     env['CXX'] = 'arm-none-eabi-g++'
     env['AS'] = 'arm-none-eabi-as'
-    env['AR'] = 'arm-none-eabi-ar'
+    env['AR'] = 'arm-none-eabi-gcc-ar'
     env['OBJDUMP'] = 'arm-none-eabi-objdump'
     env['OBJCOPY'] = 'arm-none-eabi-objcopy'
     env['NM'] = 'arm-none-eabi-nm'
