@@ -78,7 +78,8 @@
         "calc_div.h": "c",
         "sw_timer_port.h": "c",
         "sw_timer.h": "c",
-        "reg_sysc_cpu.h": "c"
+        "reg_sysc_cpu.h": "c",
+        "string_view": "c"
     },
     "editor.detectIndentation": false,
     "restructuredtext.confPath": "${workspaceFolder}\\doc",

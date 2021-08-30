@@ -87,30 +87,47 @@ HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, u
         /* Init tickstart for timeout managment */
         //TODO
         huart->Tx_Env.Interrupt.XferCount = Size;
-        
-        while (huart->Tx_Env.Interrupt.XferCount > 0U )
+        if (Timeout != HAL_MAX_DELAY)
         {
-            if(systick_poll_timeout(tickstart,timeout,uart_flag_poll,huart,UART_SR_TFNF))
+            while (huart->Tx_Env.Interrupt.XferCount > 0U )
+            {
+                if(systick_poll_timeout(tickstart,timeout,uart_flag_poll,huart,UART_SR_TFNF))
+                {
+                    huart->gState = HAL_UART_STATE_READY;
+                    return HAL_TIMEOUT;
+                }
+               else
+                {
+                    //Transmit FIFO Not Full
+                    huart->Tx_Env.Interrupt.XferCount--;
+                    huart->UARTX->TBR = (*pData++ & (uint8_t)0xFF);
+                    if (huart->Tx_Env.Interrupt.XferCount == 0)
+                    {
+                        break;
+                    }
+                }
+            }
+            // Wait until TX Finish
+            if(systick_poll_timeout(tickstart,timeout,uart_flag_poll,huart,UART_SR_TEMT))
             {
                 huart->gState = HAL_UART_STATE_READY;
                 return HAL_TIMEOUT;
             }
-           else
-            {
-                //Transmit FIFO Not Full
-                huart->Tx_Env.Interrupt.XferCount--;
-                huart->UARTX->TBR = (*pData++ & (uint8_t)0xFF);
-                if (huart->Tx_Env.Interrupt.XferCount == 0)
+        }
+        else
+        {
+            while (huart->Tx_Env.Interrupt.XferCount > 0U )
+            {   
+                // Wait until TX fifo not empty
+                if(REG_FIELD_RD(huart->UARTX->SR,  UART_SR_TFNF))
                 {
-                    break;
+                    huart->Tx_Env.Interrupt.XferCount--;
+                    huart->UARTX->TBR = (*pData++ & (uint8_t)0xFF);
                 }
             }
-        }
-        // Wait until TX Finish
-        if(systick_poll_timeout(tickstart,timeout,uart_flag_poll,huart,UART_SR_TEMT))
-        {
-            huart->gState = HAL_UART_STATE_READY;
-            return HAL_TIMEOUT;
+            // Wait until TX Finish
+            while(REG_FIELD_RD(huart->UARTX->SR,  UART_SR_TEMT))
+            ;
         }
         /* At end of Tx process, restore huart->gState to Ready */
         huart->gState = HAL_UART_STATE_READY;
@@ -142,19 +159,32 @@ HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, ui
         //todo
     
         huart->Rx_Env.Interrupt.XferCount = Size;
-
-        /* Check the remain data to be received */
-        while (huart->Rx_Env.Interrupt.XferCount > 0U)
+        if(Timeout !=HAL_MAX_DELAY)
         {
-            if(systick_poll_timeout(tickstart,timeout,uart_flag_poll,huart,UART_SR_RFNE))
+            /* Check the remain data to be received */
+            while (huart->Rx_Env.Interrupt.XferCount > 0U)
             {
-                huart->RxState = HAL_UART_STATE_READY;
-                return HAL_TIMEOUT;
+                if(systick_poll_timeout(tickstart,timeout,uart_flag_poll,huart,UART_SR_RFNE))
+                {
+                    huart->RxState = HAL_UART_STATE_READY;
+                    return HAL_TIMEOUT;
+                }
+               else
+                {
+                    huart->Rx_Env.Interrupt.XferCount--;
+                    *pData++ = (uint8_t)(huart->UARTX->RBR & (uint8_t)0x00FF);
+                }
             }
-           else
+        }
+        else
+        {
+            while (huart->Rx_Env.Interrupt.XferCount > 0U)
             {
-                huart->Rx_Env.Interrupt.XferCount--;
-                *pData++ = (uint8_t)(huart->UARTX->RBR & (uint8_t)0x00FF);
+                if(REG_FIELD_RD(huart->UARTX->SR,  UART_SR_RFNE))
+                {
+                    huart->Rx_Env.Interrupt.XferCount--;
+                    *pData++ = (uint8_t)(huart->UARTX->RBR & (uint8_t)0x00FF);
+                }
             }
         }
         /* At end of Rx process, restore huart->RxState to Ready */

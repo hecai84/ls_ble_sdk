@@ -49,13 +49,15 @@ elif ic== 'gemini' :
     sbl_code_exec_addr = 0x20001000
     uart_cmd_mask = 0xffffffff
     feature_mask = 0xffffffff
+    crc_data = struct.pack('IIIIIII',test_word0,test_word1,code_offset,sbl_code_length,sbl_code_exec_addr,uart_cmd_mask,feature_mask)
+    crc_rslt = zlib.crc32(crc_data)
     data_storage_base = 0x802000
     data_storage_size = 0x3000
     assert(data_storage_base >= sbl_code_start + sbl_code_length)
     app_image_base = 0x805000
     assert(app_image_base >= data_storage_base + data_storage_size)
     fota_image_base = 0x83d000
-    info_head = struct.pack('IIIIIIIIII',test_word0,test_word1,code_offset,sbl_code_length,sbl_code_exec_addr,uart_cmd_mask,feature_mask,data_storage_base,app_image_base,fota_image_base)  
+    info_head = struct.pack('IIIIIIIIIII',test_word0,test_word1,code_offset,sbl_code_length,sbl_code_exec_addr,uart_cmd_mask,feature_mask,crc_rslt,data_storage_base,app_image_base,fota_image_base)  
 
 mac_addr_base = flash_base + 0x30
 mac_addr = bytes([0xff,0xff,0xff,0xff,0xff,0xff]) # ff:ff:ff:ff:ff:ff is not a valid address

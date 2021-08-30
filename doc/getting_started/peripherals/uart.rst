@@ -150,6 +150,9 @@ UART 是在应用程序开发过程中使用次数最多的数据总线。
     HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout);
     HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size,uint32_t Timeout);
 
+.. note ::
+    Timeout以ms为单位，当Timeout = 0xffffffff时，超时时间为无限长。
+
 3.2 数据收发——非阻塞（中断）方式
 ....................................
 
@@ -216,8 +219,8 @@ UART 是在应用程序开发过程中使用次数最多的数据总线。
 
     static void uart_test()
     {
-        HAL_UART_Transmit_IT(&UART_Config,uart_tx_buf,1,NULL);
-        HAL_UART_Receive_IT(&UART_Config,uart_rx_buf,1,NULL);
+        HAL_UART_Transmit_IT(&UART_Config,uart_tx_buf,1);
+        HAL_UART_Receive_IT(&UART_Config,uart_rx_buf,1);
     }
 
     int main()
