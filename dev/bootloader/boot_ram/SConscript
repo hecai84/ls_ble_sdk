@@ -22,5 +22,5 @@ else:
     bram_bin = bram_env.Command('#dev/soc/arm_cm/le501x/bin/bram.bin',bram_target,Action('$OBJCOPY -O binary $SOURCE $TARGET'))
 
 bram_env.AddPostAction(bram_target,Action('$OBJDUMP -d -z -x $TARGET > ${TARGET.base}.asm'))
-info_sbl_hex = bram_env.Command('#build/$IC/examples/info_sbl.hex',bram_bin,Action('python tools/info_sbl_merge.py $SOURCE ' + env['IC'] + ' $TARGET'))
+info_sbl_hex = bram_env.Command('#build/$IC/project/info_sbl.hex',bram_bin,Action('python tools/info_sbl_merge.py $SOURCE ' + env['IC'] + ' $TARGET'))
 bram_env.Depends(info_sbl_hex,['#tools/info_sbl_merge.py'])

@@ -1,4 +1,11 @@
+'''
+Description: 
+Author: hecai
+Date: 2021-09-02 14:33:54
+LastEditTime: 2021-09-03 09:30:11
+FilePath: \ls_ble_sdk\dev\bootloader\SConscript
+'''
 Import('env')
 if not 'mdk' in env['TOOLS']:
-    SConscript(dirs = 'boot_rom',exports=['env'])
+    #SConscript(dirs = 'boot_rom',exports=['env'])
     SConscript(dirs = 'boot_ram',exports=['env'])

@@ -57,6 +57,11 @@
         "adc_msp.h": "c",
         "lscrypt_msp.h": "c",
         "lscrypt.h": "c",
+        "motor.h": "c",
+        "io_config.h": "c",
+        "string.h": "c",
+        "tools.h": "c",
+        "builtin_timer.h": "c"
     },
     "editor.detectIndentation": false,
     "restructuredtext.confPath": "${workspaceFolder}\\doc",

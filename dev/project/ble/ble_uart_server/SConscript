@@ -1,0 +1,17 @@
+'''
+Description: 
+Author: hecai
+Date: 2021-09-02 23:14:51
+LastEditTime: 2021-09-16 10:32:44
+FilePath: \ls_ble_sdk\dev\project\ble\ble_uart_server\SConscript
+'''
+Import('app_build')
+src = [
+    'main.c',
+    'Motor.c',
+    "Tools.c"
+]
+inc = [
+    '.'
+]
+app_build('ble_uart_server',src,inc)

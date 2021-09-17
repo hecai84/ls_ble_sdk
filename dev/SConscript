@@ -50,7 +50,7 @@ def image_build(name,src,inc,linkscript = ''):
     if linkscript != '':
         img_env['LINKSCRIPT'] = File(linkscript)
     img_env.Append(CPPPATH = list(map(lambda x:'#/'+x.srcnode().path,inc_dirs)))
-    target_name = '#build/$IC/examples/'+name
+    target_name = '#build/$IC/project/'+name
     if img_env['BASE_ARCH'] == 'rv32':
         startfile_obj = img_env.Object(img_env['SDK_STARTUP_SRC'],CFLAGS = ' -mno-relax $CFLAGS ',OBJPREFIX = name+'-')
         img_target = img_env.Program(target_name, img_env['SDK_SRC'] + startfile_obj + src_files,OBJPREFIX = name+'-')
@@ -77,12 +77,12 @@ def app_build(app_name,src,inc,linkscript = '',ble = True,mesh = False):
             stack_hex = app_env['FW_HEX']
             app_env.Depends(app_target,[stack_hex])
         if not 'mdk' in app_env['TOOLS']:
-            app_hex = app_env.Command('#build/$IC/examples/'+app_name+'.hex',app_target,Action('$OBJCOPY -O ihex $SOURCES $TARGET'))
+            app_hex = app_env.Command('#build/$IC/project/'+app_name+'.hex',app_target,Action('$OBJCOPY -O ihex $SOURCES $TARGET'))
             if mesh or ble:
                 app_env.AddPostAction(app_target,Action('$OBJCOPY -O binary $TARGET ${TARGET.base}.ota.bin'))
-                app_env.Command('#build/$IC/examples/'+app_name+'_production.hex',['#build/$IC/examples/info_sbl.hex',app_hex,stack_hex],Action('python tools/hexmerge.py $SOURCES > $TARGET'))
+                app_env.Command('#build/$IC/project/'+app_name+'_production.hex',['#build/$IC/project/info_sbl.hex',app_hex,stack_hex],Action('python tools/hexmerge.py $SOURCES > $TARGET'))
             else:
-                app_env.Command('#build/$IC/examples/'+app_name+'_production.hex',['#build/$IC/examples/info_sbl.hex',app_hex],Action('python tools/hexmerge.py $SOURCES > $TARGET'))
+                app_env.Command('#build/$IC/project/'+app_name+'_production.hex',['#build/$IC/project/info_sbl.hex',app_hex],Action('python tools/hexmerge.py $SOURCES > $TARGET'))
         else:
             if mesh or ble:
                 print(stack_hex.srcnode().path)
@@ -90,11 +90,11 @@ def app_build(app_name,src,inc,linkscript = '',ble = True,mesh = False):
     else:
         app_env.Append(LINKFLAGS = ' -Wl,-R,' + File(app_env['ROM_SYM'][0]).path)
         app_env.Depends(app_target,app_env['ROM_SYM'])
-        app_hex = app_env.Command('#build/$IC/examples/'+app_name+'.hex',app_target,Action('$OBJCOPY -O ihex $SOURCES $TARGET'))
+        app_hex = app_env.Command('#build/$IC/project/'+app_name+'.hex',app_target,Action('$OBJCOPY -O ihex $SOURCES $TARGET'))
     if mesh or ble:
         app_env.Append(LIBS = [fw_lib])
     return app_env,app_target
 
 env.Append(LINKFLAGS = ' $GC_OPTION ')
-SConscript(dirs = 'examples',exports=['app_build','image_build','env'])
+SConscript(dirs = 'project',exports=['app_build','image_build','env'])
 SConscript(dirs = 'bootloader',exports=['env'])
