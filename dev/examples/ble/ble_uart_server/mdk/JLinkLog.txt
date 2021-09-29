@@ -1,0 +1,139 @@
+T3C64 000:273.956   SEGGER J-Link V7.54 Log File
+T3C64 000:274.220   DLL Compiled: Sep  1 2021 10:41:51
+T3C64 000:274.260   Logging started @ 2021-09-22 15:03
+T3C64 000:274.296 - 274.315ms
+T3C64 000:274.340 JLINK_SetWarnOutHandler(...)
+T3C64 000:274.380 - 0.058ms
+T3C64 000:274.419 JLINK_OpenEx(...)
+T3C64 000:279.278   Firmware: J-Link OB-STM32F072-CortexM compiled Jan  7 2019 14:09:37
+T3C64 000:279.781   Firmware: J-Link OB-STM32F072-CortexM compiled Jan  7 2019 14:09:37
+T3C64 000:280.061   Decompressing FW timestamp took 192 us
+T3C64 000:285.031   Hardware: V1.00
+T3C64 000:285.120   S/N: 4294967295
+T3C64 000:285.179   OEM: SEGGER
+T3C64 000:285.243   Feature(s): GDB, RDI, FlashBP, FlashDL, JFlash, RDDI
+T3C64 000:286.933   TELNET listener socket opened on port 19021
+T3C64 000:287.419   WEBSRV Starting webserver
+T3C64 000:287.639   WEBSRV Webserver running on local port 19080
+T3C64 000:316.663 - 42.277ms returns "O.K."
+T3C64 000:316.738 JLINK_GetEmuCaps()
+T3C64 000:316.773 - 0.048ms returns 0xB8EA5A33
+T3C64 000:316.813 JLINK_TIF_GetAvailable(...)
+T3C64 000:317.050 - 0.259ms
+T3C64 000:317.098 JLINK_SetErrorOutHandler(...)
+T3C64 000:317.127 - 0.042ms
+T3C64 000:317.186 JLINK_ExecCommand("ProjectFile = "D:\WorkSpace\BLE\ls_ble_sdk\dev\examples\ble\ble_uart_server\mdk\JLinkSettings.ini"", ...). 
+T3C64 000:355.453   Ref file found at: C:\Keil_v5\ARM\Segger\JLinkDevices.ref
+T3C64 000:363.750   XML referenced by ref file: C:\Program Files\SEGGER\JLink\JLinkDevices.xml
+T3C64 000:364.254   C:\Program Files\SEGGER\JLink\JLinkDevices.xml evaluated successfully.
+T3C64 000:365.015 - 47.848ms returns 0x00
+T3C64 000:365.167 JLINK_ExecCommand("Device = ARMCM0", ...). 
+T3C64 000:365.231   Device "CORTEX-M0" selected.
+T3C64 000:365.845 - 0.655ms returns 0x00
+T3C64 000:365.883 JLINK_ExecCommand("DisableConnectionTimeout", ...). 
+T3C64 000:365.915 - 0.032ms returns 0x01
+T3C64 000:365.962 JLINK_GetHardwareVersion()
+T3C64 000:365.990 - 0.041ms returns 10000
+T3C64 000:366.019 JLINK_GetDLLVersion()
+T3C64 000:366.046 - 0.040ms returns 75400
+T3C64 000:366.075 JLINK_GetOEMString(...)
+T3C64 000:366.103 JLINK_GetFirmwareString(...)
+T3C64 000:366.130 - 0.040ms
+T3C64 000:366.163 JLINK_GetDLLVersion()
+T3C64 000:366.190 - 0.040ms returns 75400
+T3C64 000:366.219 JLINK_GetCompileDateTime()
+T3C64 000:366.246 - 0.041ms
+T3C64 000:366.280 JLINK_GetFirmwareString(...)
+T3C64 000:366.308 - 0.041ms
+T3C64 000:366.338 JLINK_GetHardwareVersion()
+T3C64 000:366.365 - 0.041ms returns 10000
+T3C64 000:366.395 JLINK_GetSN()
+T3C64 000:366.424 - 0.042ms returns -1
+T3C64 000:366.454 JLINK_GetOEMString(...)
+T3C64 003:377.840 JLINK_TIF_Select(JLINKARM_TIF_JTAG)
+T3C64 003:378.172   
+  ***** Error: 
+T3C64 003:378.224   Debugger tries to select target interface JTAG.
+This interface is not supported by the connected emulator.
+Selection will be ignored by the DLL.
+T3C64 003:378.268 - 0.443ms returns 0x01
+T3C64 003:378.310 JLINK_HasError()
+T3C64 003:378.350 JLINK_SetSpeed(5000)
+T3C64 003:378.383 - 0.048ms
+T3C64 003:378.848 JLINK_HasError()
+T3C64 003:378.891 JLINK_SetResetType(JLINKARM_RESET_TYPE_NORMAL)
+T3C64 003:378.923 - 0.046ms returns JLINKARM_RESET_TYPE_NORMAL
+T3C64 003:378.956 JLINK_Reset()
+T3C64 003:389.904   ConfigTargetSettings() start
+T3C64 003:389.958    J-Link Script File: Executing ConfigTargetSettings()
+T3C64 003:390.245   ConfigTargetSettings() end
+T3C64 003:392.062   Found SW-DP with ID 0x0BB11477
+T3C64 003:593.900   Failed to power up DAP
+T3C64 003:744.210   ConfigTargetSettings() start
+T3C64 003:744.275    J-Link Script File: Executing ConfigTargetSettings()
+T3C64 003:744.323   ConfigTargetSettings() end
+T3C64 003:745.171   Found SW-DP with ID 0x0BB11477
+T3C64 003:946.233   Failed to power up DAP
+T3C64 004:046.839 - 667.913ms
+T3C64 004:046.918 JLINK_GetId()
+T3C64 004:047.169   ConfigTargetSettings() start
+T3C64 004:047.215    J-Link Script File: Executing ConfigTargetSettings()
+T3C64 004:047.246   ConfigTargetSettings() end
+T3C64 004:047.982   Found SW-DP with ID 0x0BB11477
+T3C64 004:049.808   Old FW that does not support reading DPIDR via DAP jobs
+T3C64 004:050.838   DPv0 detected
+T3C64 004:050.889   Scanning AP map to find all available APs
+T3C64 004:152.273   AP[0]: Stopped AP scan as end of AP map seems to be reached
+T3C64 004:152.638   Iterating through AP map to find AHB-AP to use
+T3C64 004:152.682   
+  ***** Error: 
+T3C64 004:152.719   Could not find core in Coresight setup
+T3C64 004:806.971   ConfigTargetSettings() start
+T3C64 004:807.046    J-Link Script File: Executing ConfigTargetSettings()
+T3C64 004:807.087   ConfigTargetSettings() end
+T3C64 004:807.898   Found SW-DP with ID 0x0BB11477
+T3C64 004:809.803   Old FW that does not support reading DPIDR via DAP jobs
+T3C64 004:810.796   DPv0 detected
+T3C64 004:810.849   Scanning AP map to find all available APs
+T3C64 004:912.026   AP[0]: Stopped AP scan as end of AP map seems to be reached
+T3C64 004:912.421   Iterating through AP map to find AHB-AP to use
+T3C64 004:912.465   
+  ***** Error: 
+T3C64 004:912.499   Could not find core in Coresight setup
+T3C64 005:013.067 - 966.191ms returns 0x00000000
+T3C64 005:013.613 JLINK_GetId()
+T3C64 005:013.838   ConfigTargetSettings() start
+T3C64 005:013.890    J-Link Script File: Executing ConfigTargetSettings()
+T3C64 005:013.930   ConfigTargetSettings() end
+T3C64 005:014.678   Found SW-DP with ID 0x0BB11477
+T3C64 005:016.420   Old FW that does not support reading DPIDR via DAP jobs
+T3C64 005:017.377   DPv0 detected
+T3C64 005:017.433   Scanning AP map to find all available APs
+T3C64 005:118.230   AP[0]: Stopped AP scan as end of AP map seems to be reached
+T3C64 005:118.590   Iterating through AP map to find AHB-AP to use
+T3C64 005:118.630   
+  ***** Error: 
+T3C64 005:118.664   Could not find core in Coresight setup
+T3C64 005:771.970   ConfigTargetSettings() start
+T3C64 005:772.034    J-Link Script File: Executing ConfigTargetSettings()
+T3C64 005:772.093   ConfigTargetSettings() end
+T3C64 005:772.912   Found SW-DP with ID 0x0BB11477
+T3C64 005:774.782   Old FW that does not support reading DPIDR via DAP jobs
+T3C64 005:775.776   DPv0 detected
+T3C64 005:775.858   Scanning AP map to find all available APs
+T3C64 005:877.006   AP[0]: Stopped AP scan as end of AP map seems to be reached
+T3C64 005:877.403   Iterating through AP map to find AHB-AP to use
+T3C64 005:877.456   
+  ***** Error: 
+T3C64 005:877.503   Could not find core in Coresight setup
+T3C64 005:978.260 - 964.697ms returns 0x00000000
+T3C64 005:999.216 JLINK_GetFirmwareString(...)
+T3C64 005:999.274 - 0.074ms
+T1A24 010:312.591 Looking for J-Link GUI Server exe at: C:\Keil_v5\ARM\Segger\JLinkGUIServer.exe
+T1A24 010:312.979 Looking for J-Link GUI Server exe at: C:\Program Files\SEGGER\JLink\JLinkGUIServer.exe
+T1A24 010:313.098 Forking J-Link GUI Server: C:\Program Files\SEGGER\JLink\JLinkGUIServer.exe
+T1A24 010:459.341 J-Link GUI Server info: "J-Link GUI server V7.54 "
+T3C64 023:085.057 JLINK_Close()
+T3C64 023:111.612 - 26.595ms
+T3C64 023:111.670   
+T3C64 023:111.702   Closed

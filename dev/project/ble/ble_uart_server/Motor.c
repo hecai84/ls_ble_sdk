@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: hecai
  * @Date: 2021-09-14 15:27:57
- * @LastEditTime: 2021-09-18 01:07:39
+ * @LastEditTime: 2021-09-26 15:47:36
  * @FilePath: \ls_ble_sdk\dev\project\ble\ble_uart_server\Motor.c
  */
 #include "Motor.h"
@@ -45,21 +45,27 @@ void closeDoor(void *param)
     LOG_I("closeDoor");    
     stopMotor(NULL);
     io_write_pin(PB08,1);  
-    io_write_pin(PB13,1);
-    io_write_pin(PB15,1);
+    io_write_pin(PA00,1);
+    io_write_pin(PB14,1);
     return;
 }
 
 void openDoor(void *param)
 {
     uint16_t delayT=0;
+    if(motor_timer_inst1!=NULL)
+        builtin_timer_delete(motor_timer_inst1);
+    if(motor_timer_inst2!=NULL)
+        builtin_timer_delete(motor_timer_inst2);
+    if(motor_timer_inst3!=NULL)
+        builtin_timer_delete(motor_timer_inst3);
     stopMotor(NULL);
     LOG_I("openDoor");
     io_write_pin(PB08,1);  
-    io_write_pin(PA00,1);
-    io_write_pin(PB14,1);
+    io_write_pin(PB13,1);
+    io_write_pin(PB15,1);
 
-    delayT+=800;
+    delayT+=500;
     motor_timer_inst1=builtin_timer_create(stopMotor);
     builtin_timer_start(motor_timer_inst1, delayT, NULL);
     
@@ -67,7 +73,7 @@ void openDoor(void *param)
     motor_timer_inst2=builtin_timer_create(closeDoor);
     builtin_timer_start(motor_timer_inst2, delayT, NULL);
     
-    delayT+=800;
+    delayT+=500;
     motor_timer_inst3=builtin_timer_create(stopMotor);
     builtin_timer_start(motor_timer_inst3, delayT, NULL);
     return;

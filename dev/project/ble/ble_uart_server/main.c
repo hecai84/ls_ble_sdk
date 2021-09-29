@@ -12,6 +12,8 @@
 #include "io_config.h"
 #include "SEGGER_RTT.h"
 #include "Motor.h"
+#include "lsrtc.h"
+#include "sleep.h"
 
 #define UART_SVC_ADV_NAME "LS UART Server1"
 #define UART_SERVER_MAX_MTU  247
@@ -134,6 +136,17 @@ static void ls_uart_server_update_adv_interval(uint8_t input_intv)
     update_adv_intv_flag = true;
 }
 
+static void sleeptest(void * param)
+{
+    struct deep_sleep_wakeup wkup;
+    HAL_RTC_Init(RTC_CKSEL_LSI);
+    RTC_wkuptime_set(5);
+    memset(&wkup,0,sizeof(wkup));
+
+    wkup.rtc = 1;
+    enter_deep_sleep_mode_lvl2_lvl3(&wkup);
+}
+
 static void ls_uart_server_timer_cb(void *param)
 {
     if(connect_id != 0xff)
@@ -141,10 +154,10 @@ static void ls_uart_server_timer_cb(void *param)
         uint32_t cpu_stat = enter_critical();
         //LOG_I("uart timer out, length=%d", uart_server_rx_index);
 
-        if(f_open_door && uart_server_ntf_done)
+        if(f_open_door)
         {
+            LOG_I("start open");
             f_open_door = false;
-            uart_server_ntf_done = false;
             openDoor(NULL);
         }
 
@@ -157,6 +170,12 @@ static void ls_uart_server_timer_cb(void *param)
     {
         ls_uart_server_update_adv_interval(input_char);
     }
+    if(input_char=='s')
+    {
+        LOG_I("sleep");
+        sleeptest(NULL);
+    }
+
     if(uart_server_timer_inst)
     {
         builtin_timer_start(uart_server_timer_inst, UART_SERVER_TIMEOUT, NULL); 
@@ -284,12 +303,17 @@ static void gatt_manager_callback(enum gatt_evt_type type,union gatt_evt_u *evt,
     case SERVER_WRITE_REQ:
         LOG_I("write req");
         uart_server_buf[uart_server_rx_index++] = evt->server_write_req.value[0];
-        //LOG_I("%0x",dev_addr_str);
+        LOG_I("%d-%0x",evt->server_write_req.length,evt->server_write_req.value[0]);
         if(evt->server_write_req.length>0 && evt->server_write_req.value[0]==0x77)
         {
-            f_open_door=true;
+            //LOG_I("set f_open_door");
+            //f_open_door=true;
+            
+            LOG_I("start open");
+            //f_open_door = false;
+            openDoor(NULL);
         }
-        ls_uart_server_write_req_ind(evt->server_write_req.att_idx, con_idx, evt->server_write_req.length, evt->server_write_req.value);
+        //ls_uart_server_write_req_ind(evt->server_write_req.att_idx, con_idx, evt->server_write_req.length, evt->server_write_req.value);
     break;
     case SERVER_NOTIFICATION_DONE:
         uart_server_ntf_done = true;
@@ -309,8 +333,8 @@ static void gatt_manager_callback(enum gatt_evt_type type,union gatt_evt_u *evt,
 static void create_adv_obj()
 {
     struct legacy_adv_obj_param adv_param = {
-        .adv_intv_min = 0x20,
-        .adv_intv_max = 0x20,
+        .adv_intv_min = 1500,
+        .adv_intv_max = 1500,
         .own_addr_type = PUBLIC_OR_RANDOM_STATIC_ADDR,
         .filter_policy = 0,
         .ch_map = 0x7,
@@ -377,9 +401,9 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
         LOG_I("type:%d,addr:",type);
         LOG_HEX(dev_addr+2,sizeof(dev_addr)-2);
         dev_manager_add_service((struct svc_decl *)&ls_uart_server_svc);
-        ls_uart_init(); 
-        HAL_UART_Receive_IT(&UART_Server_Config, &uart_server_rx_byte, 1); 
-        ls_uart_server_init();      
+        //ls_uart_init(); 
+        //HAL_UART_Receive_IT(&UART_Server_Config, &uart_server_rx_byte, 1); 
+        //ls_uart_server_init();      
     }
     break;
     case SERVICE_ADDED:
