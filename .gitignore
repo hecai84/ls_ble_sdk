@@ -6,3 +6,5 @@ doc/_build/
 *.lst
 *.uvguix.*
 *.map
+pcb/fp-info-cache
+pcb/BlueLock.pro
