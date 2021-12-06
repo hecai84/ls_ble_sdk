@@ -7,7 +7,6 @@
 #include "compile_flag.h"
 #include "ls_dbg.h"
 #include "platform.h"
-#include "log.h"
 #ifndef FLASH_PROG_ALGO
 #define PUYA_SUSPEND_WORKAROUND 1
 #else
@@ -194,7 +193,6 @@ XIP_BANNED static void flash_writing_critical(void (*func)(void *),void *param)
     exit_critical(cpu_stat);
     flash_stat.writing = false;
     spi_flash_xip_start();
-    LOG_I("a 0x%x", writing_end_time);
 }
 
 
