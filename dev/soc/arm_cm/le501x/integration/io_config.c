@@ -89,6 +89,7 @@ static void uart_io_cfg(uint8_t txd,uint8_t rxd)
     io_set_pin(txd);
     io_cfg_output(txd);
     io_cfg_input(rxd);
+	io_pull_write(rxd,IO_PULL_UP);
 }
 
 void af_io_init(gpio_pin_t *pin,enum GPIO_AF af)
