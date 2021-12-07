@@ -5,4 +5,4 @@ src = [
 inc = [
     '.'
 ]
-app_build('pdm_test',src,inc)
+app_build('pdm_test',src,inc,ble = False)
