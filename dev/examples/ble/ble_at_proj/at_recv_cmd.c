@@ -275,18 +275,20 @@ void at_load_info_from_flash(void)
     if(ret != TINYFS_NO_ERROR)
     {
         LOG_I("at read:%d",ret);
+        ls_at_buff_env.default_info.rfpower = 6;
+        ls_at_buff_env.default_info.advint = 0;
     }
     else
     {
         memcpy(&ls_at_buff_env, &buff, len);
-        if(ls_at_buff_env.default_info.rfpower>5) {
-            ls_at_buff_env.default_info.rfpower = 0;
+        if(ls_at_buff_env.default_info.rfpower>16) {
+            ls_at_buff_env.default_info.rfpower = 6;
         }
         if(ls_at_buff_env.default_info.advint>5) {
             ls_at_buff_env.default_info.advint = 0;
         }
-        rf_set_power(tx_power_arr[ls_at_buff_env.default_info.rfpower]);
     }
+    rf_set_power(ls_at_buff_env.default_info.rfpower);
 }
 
 void at_store_info_to_flash(void)
