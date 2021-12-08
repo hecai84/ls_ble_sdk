@@ -175,7 +175,6 @@ NOINLINE XIP_BANNED static void cpu_flash_deep_sleep_and_recover()
     power_down_hardware_modules();
     cpu_sleep_asm();
     power_up_hardware_modules();
-    remove_hw_isolation();
     __disable_irq();
     spi_flash_init();
     spi_flash_release_from_deep_power_down();
