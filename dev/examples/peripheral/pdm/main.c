@@ -85,7 +85,7 @@ void pdm_init()
 
 int main()
 {
-    sys_init_app();   
+    sys_init_none();   
     DMA_CONTROLLER_INIT(dmac1_inst);
     ls_pdm_uart_init();
     pdm_init();
