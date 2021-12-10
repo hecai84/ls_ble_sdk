@@ -50,13 +50,6 @@ static const at_cmd_attr_t at_cmd_attr_table[] =
 };
 
 const uint16_t adv_int_arr[6] = {80, 160, 320, 800, 1600, 3200};
-//4: 0dbm
-//0: -20dbm
-//2: -8dbm
-//8: 4dbm
-//7: 10dbm
-//b: 12dbm
-const uint16_t tx_power_arr[6] = {4, 0, 2, 8, 7, 0xb};
 
 uint8_t *find_int_from_str(uint8_t *buff)
 {
@@ -598,12 +591,12 @@ static void at_tx_power_handler(uint8_t *p_cmd_parse)
             break;
         case '=':
             ls_at_buff_env.default_info.rfpower = atoi((const char *)p_cmd_parse);
-            if(ls_at_buff_env.default_info.rfpower > 5)
+            if(ls_at_buff_env.default_info.rfpower > 16)
                 msg_len = sprintf((char *)msg_rsp,"\r\n+POWER:%d\r\nERR\r\n",ls_at_buff_env.default_info.rfpower);
             else
             {
-                LOG_I("power:%d",tx_power_arr[ls_at_buff_env.default_info.rfpower]);
-                rf_set_power(tx_power_arr[ls_at_buff_env.default_info.rfpower]);
+                LOG_I("power:%d",ls_at_buff_env.default_info.rfpower);
+                rf_set_power(ls_at_buff_env.default_info.rfpower);
                 msg_len = sprintf((char *)msg_rsp,"\r\n+POWER:%d\r\nOK\r\n",ls_at_buff_env.default_info.rfpower);
             }
             uart_write(msg_rsp,msg_len);

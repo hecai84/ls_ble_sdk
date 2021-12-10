@@ -231,6 +231,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 static void ls_uart_init(void)
 {
     uart1_io_init(PB00, PB01);
+	io_pull_write(PB01, IO_PULL_UP);
     UART_Server_Config.UARTX = UART1;
     UART_Server_Config.Init.BaudRate = UART_BAUDRATE_115200;
     UART_Server_Config.Init.MSBEN = 0;
@@ -275,18 +276,20 @@ void at_load_info_from_flash(void)
     if(ret != TINYFS_NO_ERROR)
     {
         LOG_I("at read:%d",ret);
+        ls_at_buff_env.default_info.rfpower = 6;
+        ls_at_buff_env.default_info.advint = 0;
     }
     else
     {
         memcpy(&ls_at_buff_env, &buff, len);
-        if(ls_at_buff_env.default_info.rfpower>5) {
-            ls_at_buff_env.default_info.rfpower = 0;
+        if(ls_at_buff_env.default_info.rfpower>16) {
+            ls_at_buff_env.default_info.rfpower = 6;
         }
         if(ls_at_buff_env.default_info.advint>5) {
             ls_at_buff_env.default_info.advint = 0;
         }
-        rf_set_power(tx_power_arr[ls_at_buff_env.default_info.rfpower]);
     }
+    rf_set_power(ls_at_buff_env.default_info.rfpower);
 }
 
 void at_store_info_to_flash(void)
