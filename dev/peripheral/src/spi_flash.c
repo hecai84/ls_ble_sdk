@@ -7,6 +7,7 @@
 #include "compile_flag.h"
 #include "ls_dbg.h"
 #include "platform.h"
+#include "flash_svcall_int.h"
 #ifndef FLASH_PROG_ALGO
 #define PUYA_SUSPEND_WORKAROUND 1
 #else
@@ -179,20 +180,30 @@ NOINLINE XIP_BANNED static void flash_reading_critical(void (*func)(void *),void
 static void do_spi_flash_prog_func(void *param);
 XIP_BANNED static void flash_writing_critical(void (*func)(void *),void *param)
 {
-    uint32_t cpu_stat = enter_critical();
-    spi_flash_xip_stop();
-    spi_flash_write_enable();
-    func(param);
-    uint32_t writing_end_time = systick_get_value();
-    DELAY_US(500);
-    flash_stat.writing = true;
-    exit_critical(cpu_stat);
-    systick_poll_timeout(writing_end_time,func == do_spi_flash_prog_func ? SYSTICK_MS2TICKS(1):SYSTICK_MS2TICKS(7),NULL);
-    cpu_stat = enter_critical();
-    spi_flash_write_status_check();
-    exit_critical(cpu_stat);
-    flash_stat.writing = false;
-    spi_flash_xip_start();
+    if(GLOBAL_INT_MASK_STATUS())
+    {
+        spi_flash_xip_stop();
+        spi_flash_write_enable();
+        func(param);
+        spi_flash_write_status_check();
+        spi_flash_xip_start();
+    }else
+    {
+        uint32_t cpu_stat = enter_critical();
+        spi_flash_xip_stop();
+        spi_flash_write_enable();
+        func(param);
+        uint32_t writing_end_time = systick_get_value();
+        DELAY_US(500);
+        flash_stat.writing = true;
+        exit_critical(cpu_stat);
+        systick_poll_timeout(writing_end_time,func == do_spi_flash_prog_func ? SYSTICK_MS2TICKS(1):SYSTICK_MS2TICKS(7),NULL);
+        cpu_stat = enter_critical();
+        spi_flash_write_status_check();
+        exit_critical(cpu_stat);
+        flash_stat.writing = false;
+        spi_flash_xip_start();
+    }
 }
 
 
