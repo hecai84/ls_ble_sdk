@@ -10,3 +10,4 @@ if env['IC'] == 'le501x':
     SConscript(dirs = 'ble_at_proj',exports=['app_build'])
     SConscript(dirs = 'ble_hid',exports=['app_build'])
     SConscript(dirs = 'ble_hid_dmic',exports=['app_build'])
+    SConscript(dirs = 'ble_rssi_distance_detect',exports=['app_build'])
