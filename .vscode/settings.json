@@ -63,7 +63,9 @@
         "tools.h": "c",
         "builtin_timer.h": "c",
         "at_cmd_parse.h": "c",
-        "segger_rtt.h": "c"
+        "segger_rtt.h": "c",
+        "flash.h": "c",
+        "type_traits": "c"
     },
     "editor.detectIndentation": false,
     "restructuredtext.confPath": "${workspaceFolder}\\doc",
