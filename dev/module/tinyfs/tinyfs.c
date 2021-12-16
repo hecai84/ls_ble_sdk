@@ -148,8 +148,6 @@ static const uint8_t node_metadata_length[NODE_TYPE_MAX] = {
     [DIR_REMOVE] = DIR_REMOVE_LENGTH,
 };
 
-static uint16_t data_write_through(void);
-
 void *root_dir_ptr;
 #define root_dir ((tinyfs_node_t *)root_dir_ptr)
 #define GET_FLASH_ADDR(section, offset) (tinyfs_env.base + (section)*TINYFS_SECTION_SIZE + (offset))
@@ -769,7 +767,7 @@ static void tinyfs_list_init(tinyfs_list_t *env,uint16_t len)
     for(i=0;i<len;++i)
     {
         node_list_init(&env[i].list);
-        env->size = 0;
+        env[i].size = 0;
     }
 }
 
@@ -994,23 +992,34 @@ static void section_copy(uint16_t section)
     node_list_copy(&tinyfs_list[section].list);
 }
 
+static void data_write_through()
+{
+    tinyfs_env.tail_available_offset =  (tinyfs_env.tail_available_offset + TINYFS_WRITE_CACHE_SIZE) & ~(TINYFS_WRITE_CACHE_SIZE - 1);
+    tinyfs_nvm_write_through();
+}
+
 static void section_garbage_collection(uint16_t section)
 {
     section_copy(section);
-    data_write_through();
+    if(tinyfs_env.tail_available_offset % TINYFS_WRITE_CACHE_SIZE)
+    {
+        data_write_through();
+    }
 }
 
-static void garbage_collect_try(uint16_t size)
+static bool garbage_collect_try(uint16_t size)
 {
     if(tinyfs_env.gc_section != INVALID_SECTION)
     {
         if( get_next_section(tinyfs_env.tail_section) == get_prev_section(tinyfs_env.gc_section) 
-            && tinyfs_env.tail_available_offset + MAX(size,tinyfs_list[tinyfs_env.gc_section].size) > TINYFS_SECTION_SIZE)
+            && tinyfs_env.tail_available_offset + size + tinyfs_list[tinyfs_env.gc_section].size > TINYFS_SECTION_SIZE)
         {
             section_garbage_collection(tinyfs_env.gc_section);
             tinyfs_env.gc_section = get_next_section(tinyfs_env.gc_section);
+            return true;
         }
     }
+    return false;
 }
 
 static bool if_dir_exist(tinyfs_node_t *dir)
@@ -1522,22 +1531,19 @@ uint8_t tinyfs_hierarchy_del_record(tinyfs_hierarchy_del_record_t *param, ...)
 uint16_t tinyfs_write_through()
 {
     tinyfs_mutex_lock();
-    uint16_t padding_length = 0;
-    padding_length = data_write_through();
-    tinyfs_mutex_unlock();
-    return padding_length;
-}
-
-static uint16_t data_write_through()
-{
-    uint16_t padding_length = 0;
+    uint16_t padding_length;
     if(tinyfs_env.tail_available_offset % TINYFS_WRITE_CACHE_SIZE)
     {
         padding_length = TINYFS_WRITE_CACHE_SIZE - tinyfs_env.tail_available_offset % TINYFS_WRITE_CACHE_SIZE;
-        tinyfs_env.tail_available_offset =  (tinyfs_env.tail_available_offset + TINYFS_WRITE_CACHE_SIZE) & ~(TINYFS_WRITE_CACHE_SIZE - 1);
-
+        if(garbage_collect_try(padding_length)==false)
+        {
+            data_write_through();
+        }
+    }else
+    {
+        padding_length = 0;
     }
-    tinyfs_nvm_write_through();
+    tinyfs_mutex_unlock();
     return padding_length;
 }
 
