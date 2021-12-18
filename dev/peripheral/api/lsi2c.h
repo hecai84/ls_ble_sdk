@@ -9,13 +9,29 @@
 #include "i2c_misc.h"
 #include "reg_base_addr.h"
 
+
+/** \addtogroup PERIPHERAL
+ *  @{
+ */
+
+/** \addtogroup LSI2C
+ *  @{
+ */
+
+/// LSI2C Macro for Register Access
 #ifdef I2C1_BASE_ADDR
 #define I2C1 ((reg_i2c_t *)I2C1_BASE_ADDR)
 #endif
 #ifdef I2C2_BASE_ADDR
 #define I2C2 ((reg_i2c_t *)I2C2_BASE_ADDR)
 #endif
+#ifdef I2C3_BASE_ADDR
+#define I2C3 ((reg_i2c_t *)I2C3_BASE_ADDR)
+#endif
 
+/** @defgroup SPI_Error_Code SPI Error Code
+  * @{
+  */
 #define HAL_I2C_ERROR_NONE              0x00000000U    /*!< No error              */
 #define HAL_I2C_ERROR_BERR              0x00000001U    /*!< BERR error            */
 #define HAL_I2C_ERROR_ARLO              0x00000002U    /*!< ARLO error            */
@@ -25,10 +41,49 @@
 #define HAL_I2C_ERROR_TIMEOUT           0x00000020U    /*!< Timeout Error         */
 #define HAL_I2C_ERROR_SIZE              0x00000040U    /*!< Size Management error */
 #define HAL_I2C_ERROR_DMA_PARAM         0x00000080U    /*!< DMA Parameter Error   */
+/**
+  * @}
+  */
+
+
+/**
+ *  @defgroup I2C_addressing_mode I2C addressing mode.
+ */
+#define I2C_ADDRESSINGMODE_7BIT         0x00000000U             /*!< 7bits addressing mode   */
+#define I2C_ADDRESSINGMODE_10BIT        I2C_OAR1_OA1MODE_MASK   /*!< 10bits addressing mode   */
+
+/**
+ *  @defgroup I2C_dual_addressing_mode  I2C dual addressing mode.
+ */
+#define I2C_DUALADDRESS_DISABLE        0x00000000U              /*!< Disable I2C dual addressing mode   */
+#define I2C_DUALADDRESS_ENABLE         I2C_OAR2_OA2EN_MASK      /*!< Enable I2C dual addressing mode   */
+
+/**
+ *  @defgroup I2C_general_call_addressing_mode I2C general call addressing mode.
+ */
+#define I2C_GENERALCALL_DISABLE        0x00000000U              /*!< Disable I2C general call addressing mode   */
+#define I2C_GENERALCALL_ENABLE         I2C_CR1_GCEN_MASK        /*!< Enable I2C general call addressing mode   */
+
+/**
+ *  @defgroup I2C_nostretch_mode I2C nostretch mode.
+ */ 
+#define I2C_NOSTRETCH_DISABLE          0x00000000U              /*!< Disable I2C nostretch mode.   */
+#define I2C_NOSTRETCH_ENABLE           I2C_CR1_NOSTRETCH_MASK   /*!< Disable I2C nostretch mode.   */
+
+/** 
+  * @defgroup I2C_Memory_Address_Size I2C Memory Address Size
+  */
+#define I2C_MEMADD_SIZE_8BIT            0x00000001U
+#define I2C_MEMADD_SIZE_16BIT           0x00000010U
+
+
+ /**
+  * @brief  SPI Configuration Structure definition
+  */
 typedef struct
 {
   uint32_t ClockSpeed;       /*!< Specifies the clock frequency.
-                                  This parameter must be set to a value lower than 400kHz */
+                                  This parameter must be set to a value lower than 1MHz */
 
   uint32_t OwnAddress1;      /*!< Specifies the first device own address.
                                   This parameter can be a 7-bit or 10-bit address. */
@@ -47,10 +102,10 @@ typedef struct
 
   uint32_t NoStretchMode;    /*!< Specifies if nostretch mode is selected.
                                   This parameter can be a value of @ref I2C_nostretch_mode */
-
 } I2C_InitTypeDef;
+
 /**
- *  @brief I2C_handle_Structure_definition I2C handle Structure definition.
+ *  @brief I2C DMA Environment.
  */
  struct I2cDMAEnv
 {
@@ -58,12 +113,18 @@ typedef struct
     uint8_t                       DMA_Channel;
 };
 
+/**
+ *  @brief I2C Interrupt Environment.
+ */
 struct I2cInterruptEnv
 {
-    uint8_t                       *pBuffPtr;      /*!< Pointer to UART Tx transfer Buffer */
-    uint16_t                      XferCount;      /*!< UART Tx Transfer Counter           */
+    uint8_t                       *pBuffPtr;      /*!< Pointer to I2C transfer Buffer */
+    uint16_t                      XferCount;      /*!< I2C Transfer Counter           */
 };
 
+/**
+ *  @brief I2C_handle_Structure_definition I2C handle Structure definition.
+ */
 typedef struct __I2C_HandleTypeDef
 {
   reg_i2c_t                	*Instance;      /*!< I2C registers base address               */
@@ -98,26 +159,8 @@ typedef struct __I2C_HandleTypeDef
 
   uint32_t              EventCount;     /*!< I2C Event counter                        */
 } I2C_HandleTypeDef;
-/**
- *  @brief I2C_addressing_mode I2C addressing mode.
- */
-#define I2C_ADDRESSINGMODE_7BIT         0x00000000U
-#define I2C_ADDRESSINGMODE_10BIT        I2C_OAR1_OA1MODE_MASK
-/**
- *  @brief I2C_dual_addressing_mode  I2C dual addressing mode.
- */
-#define I2C_DUALADDRESS_DISABLE        0x00000000U
-#define I2C_DUALADDRESS_ENABLE         I2C_OAR2_OA2EN_MASK
-/**
- *  @brief I2C_general_call_addressing_mode I2C general call addressing mode.
- */
-#define I2C_GENERALCALL_DISABLE        0x00000000U
-#define I2C_GENERALCALL_ENABLE         I2C_CR1_GCEN_MASK
-/**
- *  @brief I2C_nostretch_mode I2C nostretch mode.
- */
-#define I2C_NOSTRETCH_DISABLE          0x00000000U
-#define I2C_NOSTRETCH_ENABLE           I2C_CR1_NOSTRETCH_MASK
+
+
 /**
   ****************************************************************************************
   * @brief  Initializes the I2C according to the specified parameters
@@ -147,7 +190,7 @@ HAL_StatusTypeDef HAL_I2C_DeInit(I2C_HandleTypeDef *hi2c);
   *                    in datasheet must be shifted to the left before calling the interface
   * @param  pData Pointer to data buffer
   * @param  Size Amount of data to be sent
-  * @param  Timeout Timeout duration
+  * @param  Timeout Timeout duration.note：when Timeout = HAL_MAX_DELAY，that means the timeout is not valid.
   *
   * @return HAL status            returned HAL_BUSY/HAL_OK/HAL_ERROR information
   ****************************************************************************************
@@ -162,11 +205,59 @@ HAL_StatusTypeDef HAL_I2C_Master_Transmit(I2C_HandleTypeDef *hi2c, uint16_t DevA
   *                    in datasheet must be shifted to the left before calling the interface
   * @param  pData Pointer to data buffer
   * @param  Size Amount of data to be sent
-  * @param  Timeout Timeout duration
+  * @param  Timeout Timeout duration。note：when Timeout = HAL_MAX_DELAY，that means the timeout is not valid.
   * @return HAL status            returned HAL_BUSY/HAL_OK/HAL_ERROR information
   ****************************************************************************************
   */
 HAL_StatusTypeDef HAL_I2C_Master_Receive(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size, uint32_t Timeout);
+
+/**
+  ****************************************************************************************
+  * @brief  Write an amount of data in blocking mode to a specific memory address
+  * @param  hi2c Pointer to a I2C_HandleTypeDef structure that contains
+  *                the configuration information for the specified I2C.
+  * @param  DevAddress Target device address: The device 7 bits address value
+  *         in datasheet must be shifted to the left before calling the interface
+  * @param  MemAddress Internal memory address
+  * @param  MemAddSize Size of internal memory address
+  * @param  pData Pointer to data buffer
+  * @param  Size Amount of data to be sent
+  * @param  Timeout Timeout duration
+  * @retval HAL status
+  ****************************************************************************************
+  */
+HAL_StatusTypeDef HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
+
+/**
+  ****************************************************************************************
+  * @brief  Read an amount of data in blocking mode from a specific memory address
+  * @param  hi2c Pointer to a I2C_HandleTypeDef structure that contains
+  *                the configuration information for the specified I2C.
+  * @param  DevAddress Target device address: The device 7 bits address value
+  *         in datasheet must be shifted to the left before calling the interface
+  * @param  MemAddress Internal memory address
+  * @param  MemAddSize Size of internal memory address
+  * @param  pData Pointer to data buffer
+  * @param  Size Amount of data to be sent
+  * @param  Timeout Timeout duration
+  * @retval HAL status
+  ****************************************************************************************
+  */
+HAL_StatusTypeDef HAL_I2C_Mem_Read(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);
+/**
+  ****************************************************************************************
+  * @brief  Checks if target device is ready for communication.
+  * @note   This function is used with Memory devices
+  * @param  hi2c Pointer to a I2C_HandleTypeDef structure that contains
+  *                the configuration information for the specified I2C.
+  * @param  DevAddress Target device address: The device 7 bits address value
+  *         in datasheet must be shifted to the left before calling the interface
+  * @param  Trials Number of trials
+  * @param  Timeout Timeout duration
+  * @retval HAL status
+  ****************************************************************************************
+  */
+HAL_StatusTypeDef HAL_I2C_IsDeviceReady(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint32_t Trials, uint32_t Timeout);
 /**
   ****************************************************************************************
   * @brief  Transmit in master mode an amount of data in non-blocking mode with Interrupt(Non-Blocking mode: Interrupt)
@@ -265,6 +356,10 @@ uint32_t HAL_I2C_GetError(I2C_HandleTypeDef *hi2c);
 }
 #endif
 
+/** @}*/
+
+
+/** @}*/
 
 #endif /* __le501x_HAL_I2C_H */
 
