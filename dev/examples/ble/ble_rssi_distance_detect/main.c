@@ -497,7 +497,7 @@ static void prf_added_handler(struct profile_added_evt *evt)
     {
         struct hid_db_cfg db_cfg;   
         db_cfg.hids_nb = 1;
-        db_cfg.cfg[0].svc_features = HID_KEYBOARD;
+        db_cfg.cfg[0].svc_features = HID_MOUSE;
         db_cfg.cfg[0].report_nb = 1;
         db_cfg.cfg[0].report_id[0] = 0;
         db_cfg.cfg[0].report_cfg[0] = HID_REPORT_IN;
