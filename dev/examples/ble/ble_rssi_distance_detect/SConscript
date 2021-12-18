@@ -1,7 +1,8 @@
 Import('app_build')
 src = [
     'main.c',
-    'rssi_distance_detect.c'
+    'rssi_distance_detect.c',
+    'lspcm.c'
 ]
 inc = [
     '.'
