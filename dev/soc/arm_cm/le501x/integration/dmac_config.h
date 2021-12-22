@@ -51,7 +51,7 @@ typedef enum
     CH_LSGPTIM1_UP = 50,
     CH_LSGPTIM1_TRIG = 51,
     CH_LSGPTIM1_COM = 52,
-    CH_BSTIM1_UP = 53,
+    CH_BSTIM1_UP = 56,
     CH_NONE = 63,
 } DMA_ChnSig_TypeDef;
 

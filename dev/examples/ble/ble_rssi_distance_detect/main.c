@@ -16,6 +16,8 @@
 #include "tinyfs.h"
 #include "rssi_smoothing_algo.h"
 #include "rssi_distance_detect.h"
+#include "lspcm.h"
+#include "user_pcm_config.h"
 
 #define APP_DIS_DEV_NAME                ("LS_elec_vehicle")
 #define APP_DIS_DEV_NAME_LEN            (sizeof(APP_DIS_DEV_NAME))
@@ -23,9 +25,6 @@
 /// Manufacturer Name Value
 #define APP_DIS_MANUFACTURER_NAME       ("LinkedSemi")
 #define APP_DIS_MANUFACTURER_NAME_LEN   (sizeof(APP_DIS_MANUFACTURER_NAME))
-
-/// ADV Data
-#define APP_DIS_ADV_DATA                ("LS Dis Server")
 
 /// Model Number String Value
 #define APP_DIS_MODEL_NB_STR            ("LS-BLE-1.0")
@@ -206,11 +205,14 @@ void user_distance_detect_handle(bool detected)
     if (detected)
     {
         io_set_pin(PA01);
+        PCM_update_config(UNLOCK_PCM_START_ADDR, UNLOCK_PCM_LEN);
     }
     else
     {
         io_clr_pin(PA01);
+        PCM_update_config(LOCK_PCM_START_ADDR, LOCK_PCM_LEN);
     }
+    PCM_Out_Start();
 }
 // static void update_batt_timer_cb(void* arg)
 // {
@@ -456,8 +458,8 @@ static void start_adv(void)
 static void create_adv_obj()
 {
     struct legacy_adv_obj_param adv_param = {
-        .adv_intv_min = 800,
-        .adv_intv_max = 800,
+        .adv_intv_min = 80,
+        .adv_intv_max = 80,
         .own_addr_type = PUBLIC_OR_RANDOM_STATIC_ADDR,
         .filter_policy = 0,
         .ch_map = 0x7,
@@ -497,7 +499,7 @@ static void prf_added_handler(struct profile_added_evt *evt)
     {
         struct hid_db_cfg db_cfg;   
         db_cfg.hids_nb = 1;
-        db_cfg.cfg[0].svc_features = HID_MOUSE;
+        db_cfg.cfg[0].svc_features = HID_KEYBOARD;
         db_cfg.cfg[0].report_nb = 1;
         db_cfg.cfg[0].report_id[0] = 0;
         db_cfg.cfg[0].report_cfg[0] = HID_REPORT_IN;
@@ -562,6 +564,7 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
         dev_manager_prf_dis_server_add(UNAUTH_SEC,0xffff);
         // update_batt_timer_init();
         memset((void*)&con_idx_array[0], 0xff, sizeof(con_idx_array));
+        PCM_init(SPEAKER_IO_0,SPEAKER_IO_1,PCM_SOURCE_BASE);
     }
     break;
     case PROFILE_ADDED:
