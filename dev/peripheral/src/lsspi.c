@@ -312,7 +312,7 @@ HAL_StatusTypeDef HAL_SPI_Transmit(SPI_HandleTypeDef *hspi, uint8_t *pData, uint
             {
                 hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
                 hspi->pTxBuffPtr += sizeof(uint16_t);
-                hspi->TxXferCount--;
+                hspi->TxXferCount-=sizeof(uint16_t);
             }
         }
     }
@@ -480,7 +480,7 @@ HAL_StatusTypeDef HAL_SPI_Receive(SPI_HandleTypeDef *hspi, uint8_t *pData, uint1
           /* read the received data */
         (* (uint16_t *)hspi->pRxBuffPtr) = hspi->Instance->DR;
         hspi->pRxBuffPtr += sizeof(uint16_t);
-        hspi->RxXferCount--;
+        hspi->RxXferCount-= sizeof(uint16_t);
       }
     }
   }
@@ -755,7 +755,7 @@ HAL_StatusTypeDef HAL_SPI_Transmit_IT(SPI_HandleTypeDef *hspi, uint8_t *pData, u
       if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE))
       {
         hspi->Instance->DR = *((uint16_t *)hspi->pTxBuffPtr);
-			}
+	    }
 
   }
   /* Transmit and Receive data in 8 Bit mode */
@@ -763,11 +763,11 @@ HAL_StatusTypeDef HAL_SPI_Transmit_IT(SPI_HandleTypeDef *hspi, uint8_t *pData, u
   {
       /* Check TXE flag */
       if (__HAL_SPI_GET_FLAG(hspi, SPI_FLAG_TXE))
-      {
-        hspi->TxXferCount--;
-        *( uint8_t *)&hspi->Instance->DR = (*hspi->pTxBuffPtr);
-        hspi->pTxBuffPtr++;
-			}
+       {
+	      hspi->TxXferCount--;
+		    *( uint8_t *)&hspi->Instance->DR = (*hspi->pTxBuffPtr);
+		    hspi->pTxBuffPtr++;
+	     }
   }
 	
 error :
@@ -1271,7 +1271,7 @@ static void SPI_RxISR_16BIT(struct __SPI_HandleTypeDef *hspi)
 {
   *((uint16_t *)hspi->pRxBuffPtr) = (uint16_t)(hspi->Instance->DR);
   hspi->pRxBuffPtr += sizeof(uint16_t);
-  hspi->RxXferCount--;
+  hspi->RxXferCount-=sizeof(uint16_t);
 
   if (hspi->RxXferCount == 0U)
   {
@@ -1336,7 +1336,7 @@ static HAL_StatusTypeDef SPI_EndRxTransaction(SPI_HandleTypeDef *hspi,  uint32_t
     /* Disable SPI peripheral */
     __HAL_SPI_DISABLE(hspi);
   }
-  uint32_t timeout = Timeout / (SDK_PCLK_MHZ * 1000);
+  uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
   if ((hspi->Init.Mode == SPI_MODE_MASTER) && (hspi->Init.Direction == SPI_DIRECTION_2LINES_RXONLY))
   {
     /* Wait the RXNE reset */
@@ -1368,7 +1368,7 @@ static HAL_StatusTypeDef SPI_EndRxTransaction(SPI_HandleTypeDef *hspi,  uint32_t
   */
 static HAL_StatusTypeDef SPI_EndRxTxTransaction(SPI_HandleTypeDef *hspi, uint32_t Timeout, uint32_t Tickstart)
 {
-  uint32_t timeout = Timeout / (SDK_PCLK_MHZ * 1000);
+  uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
   /* Control the BSY flag */
   if(systick_poll_timeout(Tickstart,timeout,spi_flag_poll1,hspi,SPI_FLAG_BSY))
   {
