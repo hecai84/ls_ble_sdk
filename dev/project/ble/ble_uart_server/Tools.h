@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: hecai
  * @Date: 2021-09-15 12:26:42
- * @LastEditTime: 2021-12-15 00:19:45
+ * @LastEditTime: 2021-12-30 22:43:05
  * @FilePath: \ls_ble_sdk\dev\project\ble\ble_uart_server\Tools.h
  */
 #ifndef __TOOLS_H__
@@ -31,7 +31,7 @@ void initLed(void);
 void initBt(void);
 void SetLedRed(LED_STATE state);
 void SetLedBlue(LED_STATE state);
-void CheckBattery(void);
+void UpdateBattery(void);
 void lsadc_init(void);
 
 

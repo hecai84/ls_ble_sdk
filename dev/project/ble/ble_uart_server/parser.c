@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: hecai
  * @Date: 2021-11-02 10:00:47
- * @LastEditTime: 2021-12-15 01:43:25
+ * @LastEditTime: 2021-12-30 22:20:00
  * @FilePath: \ls_ble_sdk\dev\project\ble\ble_uart_server\parser.c
  */
 #include "parser.h"
@@ -47,6 +47,7 @@ void crypt_deinit(void)
 void decodeInfo(const u8 * dat,u8 len)
 {
     u8 l,i,j;
+    crypt_init();
     l=len/16;
     memset(buff, '\0', 64);
     for(i=0;i<l;i++)
@@ -64,7 +65,7 @@ void decodeInfo(const u8 * dat,u8 len)
             buff[i*16+j]=tmpBuff[i*16+15-j];
         }
     }
-    
+    crypt_deinit();
 }
 
 void SetSysState(SYS_STATE state)
