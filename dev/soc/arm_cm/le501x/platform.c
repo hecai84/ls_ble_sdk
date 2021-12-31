@@ -222,13 +222,17 @@ uint32_t lpcycles_to_hus(uint32_t lpcycles)
 
 uint32_t lsi_freq_update_and_hs_to_lpcycles(int32_t hs_cnt)
 {
-    LS_ASSERT((NVIC->ISER[0U]&1<<GPTIMB1_IRQn)==0);
-    uint16_t ccr = LSGPTIMB->CCR1;
-    if(ccr!=lsi_dummy_cnt)
+    LS_ASSERT(hs_cnt);
+    if((NVIC->ISER[0U]&1<<GPTIMB1_IRQn)==0)
     {
-        lsi_cnt_val = ccr;
-        //LOG_I("%d,%d",lsi_cnt_val,lsi_dummy_cnt);
+        uint16_t ccr = LSGPTIMB->CCR1;
+        if(ccr!=lsi_dummy_cnt)
+        {
+            lsi_cnt_val = ccr;
+            //LOG_I("%d,%d",lsi_cnt_val,lsi_dummy_cnt);
+        }
     }
+    LS_ASSERT(lsi_cnt_val);
     uint32_t lpcycles = LSI_CNT_CYCLES*625*hs_cnt/2/lsi_cnt_val;
     //LOG_I("%d,%d,%d",lsi_cnt_val,lpcycles,hs_cnt);
     return lpcycles - 1;
@@ -273,6 +277,13 @@ uint32_t get_trng_value()
     return random32bit;
 }
 
+void rco_freq_counting_sync()
+{
+    while((NVIC->ISER[0U]&1<<GPTIMB1_IRQn));
+    while(LSGPTIMB->CCR1==lsi_dummy_cnt);
+    lsi_cnt_val = LSGPTIMB->CCR1;
+}
+
 static void module_init()
 {
     io_init();
@@ -296,6 +307,7 @@ static void module_init()
     systick_start();
     rco_freq_counting_config();
     rco_freq_counting_start();
+    rco_freq_counting_sync();
 }
 
 static void analog_init()
