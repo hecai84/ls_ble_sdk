@@ -15,6 +15,10 @@
 #define FLASH_PAGE_SIZE (256) 
 /// Flash Sector Size
 #define FLASH_SECTOR_SIZE (0x1000) 
+/// Status Register 1 SUS1 Mask
+#define STATUS_REG1_SUS1_MASK (0x80)
+/// Status Register 1 SUS2 Mask
+#define STATUS_REG1_SUS2_MASK (0x04)
 
 /** \brief Set the status variable indicating whether the Flash is in XIP mode */
 void spi_flash_xip_status_set(bool xip);
@@ -43,6 +47,11 @@ void spi_flash_read_status_register_0(uint8_t *status_reg_0);
  *  \param[out] status_reg_1
  */
 void spi_flash_read_status_register_1(uint8_t *status_reg_1);
+
+/** \brief Check WIP Status
+ *  \return WIP status
+ */
+bool spi_flash_write_in_process(void);
 
 /** \brief Write Status Register 
  *  \param[in] status The value to write to Status Register

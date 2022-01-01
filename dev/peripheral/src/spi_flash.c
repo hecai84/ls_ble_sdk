@@ -140,7 +140,7 @@ XIP_BANNED void spi_flash_read_status_register_1(uint8_t *status_reg_1)
     lsqspi_stig_read_register(READ_STATUS_REGISTER_1_OPCODE,status_reg_1,sizeof(uint8_t));
 }
 
-XIP_BANNED static bool spi_flash_write_in_process()
+XIP_BANNED bool spi_flash_write_in_process()
 {
     uint8_t status_reg_0;
     spi_flash_read_status_register_0(&status_reg_0);
