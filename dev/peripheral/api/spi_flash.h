@@ -20,6 +20,10 @@
 /// Status Register 1 SUS2 Mask
 #define STATUS_REG1_SUS2_MASK (0x04)
 
+void spi_flash_dual_mode_set(bool dual);
+
+bool spi_flash_dual_mode_get(void);
+
 /** \brief Set the status variable indicating whether the Flash is in XIP mode */
 void spi_flash_xip_status_set(bool xip);
 
@@ -58,6 +62,8 @@ bool spi_flash_write_in_process(void);
  */
 void spi_flash_write_status_register(uint16_t status);
 
+void spi_flash_dual_page_program(uint32_t offset,uint8_t *data,uint16_t length);
+
 /** \brief Quad Page Program 
  *  \param[in] offset Offset to FLASH_BASE_ADDR
  *  \param[in] data The pointer of the data to program into Flash
@@ -84,6 +90,10 @@ void spi_flash_sector_erase(uint32_t offset);
 
 /** \brief Chip Erase */
 void spi_flash_chip_erase(void);
+
+void spi_flash_multi_io_read(uint32_t offset,uint8_t *data,uint16_t length);
+
+void spi_flash_dual_io_read(uint32_t offset,uint8_t *data,uint16_t length);
 
 /** \brief Quad IO Read
  *  \param[in] offset Offset to FLASH_BASE_ADDR

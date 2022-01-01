@@ -21,6 +21,8 @@ if env['IC'] == 'le501x':
     'src/lsspi.c',
     'src/lspis.c',
     'src/lscrypt.c',
+    'src/flash_svcall.c',
+    'src/spi_flash_lsqspi.c',
 ]
 else:
     src += [

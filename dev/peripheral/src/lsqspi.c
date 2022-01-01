@@ -105,6 +105,12 @@ XIP_BANNED static void stig_rd_wr(struct lsqspi_stig_rd_wr_param *param,
     {
         start_length = (uint32_t)param->start.data % 4 ? 4 - (uint32_t)param->start.data % 4 : 0;
     }
+    /* START - flash & qspi io output conflict workaround */
+    if(start_length==0&&stig_start==stig_read_start)
+    {
+        start_length = 4;
+    }
+    /* END */
     uint32_t cpu_stat = enter_critical();
     LSQSPI->MODE_BITS = param->mode_bits;
     stig_start(&param->start,start_length,start_hold,param->quad_data);
