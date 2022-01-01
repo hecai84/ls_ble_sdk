@@ -91,7 +91,7 @@ XIP_BANNED static void wait_dpll_lock()
 
             break;
         }
-        if(i>10)
+        if(i>40)
         {
             break;
         }
