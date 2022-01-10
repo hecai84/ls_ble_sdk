@@ -37,7 +37,7 @@ uint8_t dev_addr[9] = {0x77, 0x77};
 extern uint8_t ciphertext_buff[];
 extern uint8_t plaintext_buff[];
 extern u8 pw[];
-extern u16 battery;
+extern u8 battery;
 extern bool isWorking;
 
 enum uart_svc_att_db_handles
@@ -103,7 +103,7 @@ static uint8_t connect_id = 0xff;
 // static uint16_t uart_server_rx_index = 0;
 static bool uart_server_ntf_done = true;
 static uint16_t uart_server_mtu = UART_SERVER_MTU_DFT;
-static struct builtin_timer *uart_server_timer_inst = NULL;
+//static struct builtin_timer *uart_server_timer_inst = NULL;
 static bool update_adv_intv_flag = false;
 static uint16_t cccd_config = 0;
 
@@ -134,24 +134,24 @@ static void ls_uart_server_data_length_update(uint8_t con_idx);
 //     update_adv_intv_flag = true;
 // }
 
-static void ls_uart_server_timer_cb(void *param)
-{
-    u16 handle;
-    if (isWorking == false)
-    {
-        // handle = gatt_manager_get_svc_att_handle(&ls_uart_server_svc_env, UART_SVC_IDX_TX_VAL);
-        if (uart_server_timer_inst)
-        {
-            builtin_timer_stop(uart_server_timer_inst);
-            builtin_timer_delete(uart_server_timer_inst);
-        }
-        // gatt_manager_server_send_notification(connect_id, handle, "OK", strlen("OK"), NULL);
-    }
-    if (uart_server_timer_inst)
-    {
-        builtin_timer_start(uart_server_timer_inst, UART_SERVER_TIMEOUT, NULL);
-    }
-}
+//static void ls_uart_server_timer_cb(void *param)
+//{
+//    u16 handle;
+//    if (isWorking == false)
+//    {
+//        // handle = gatt_manager_get_svc_att_handle(&ls_uart_server_svc_env, UART_SVC_IDX_TX_VAL);
+//        if (uart_server_timer_inst)
+//        {
+//            builtin_timer_stop(uart_server_timer_inst);
+//            builtin_timer_delete(uart_server_timer_inst);
+//        }
+//        // gatt_manager_server_send_notification(connect_id, handle, "OK", strlen("OK"), NULL);
+//    }
+//    if (uart_server_timer_inst)
+//    {
+//        builtin_timer_start(uart_server_timer_inst, UART_SERVER_TIMEOUT, NULL);
+//    }
+//}
 
 static void ls_uart_server_read_req_ind(uint8_t att_idx, uint8_t con_idx)
 {
@@ -187,6 +187,7 @@ static void gap_manager_callback(enum gap_evt_type type, union gap_evt_u *evt, u
     case CONNECTED:
         connect_id = con_idx;
         SetLedBlue(LED_OPEN);
+        UpdateBattery();
         LOG_I("connected!");
         break;
     case DISCONNECTED:
@@ -213,7 +214,7 @@ static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt
     CMD_TYPE cmd;
     uint16_t handle;
     u8 para[20] = {0};
-    u8 * pos;
+    u8 *pos;
     int procTime, waitTime;
     switch (type)
     {
@@ -231,19 +232,19 @@ static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt
         if (cmd == CMD_OPEN)
         {
             LOG_I("start open %s", para);
-            pos = strstr((const char *)para, ",");
+            pos = (u8 *)strstr((const char *)para, ",");
             if (pos != NULL)
             {
                 procTime = atoi((const char *)(para + 1));
                 waitTime = atoi((const char *)(pos + 1));
                 if (para[0] == '+')
                 {
-                    openDoor(procTime,waitTime); //
+                    openDoor(procTime, waitTime); //
                     gatt_manager_server_send_notification(connect_id, handle, "OK", strlen("OK"), NULL);
                 }
                 else if (para[0] == '-')
                 {
-                    openDoor(-procTime,waitTime); //
+                    openDoor(-procTime, waitTime); //
                     gatt_manager_server_send_notification(connect_id, handle, "OK", strlen("OK"), NULL);
                 }
                 else
@@ -264,8 +265,11 @@ static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt
             if (strlen((const char *)para) == 16)
             {
                 LOG_I("new pw:%s", para);
-                memcpy(pw, para, 16);
-                writeFlash(RECODE_PW, pw, 16);
+                if (strcmp((const char *)para, (const char *)pw) != 0)
+                {
+                    memcpy(pw, para, 16);
+                    writeFlash(RECODE_PW, pw, 16);
+                }
                 gatt_manager_server_send_notification(connect_id, handle, "OK", strlen("OK"), NULL);
             }
             else
@@ -363,11 +367,12 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
         dev_manager_add_service((struct svc_decl *)&ls_uart_server_svc);
         //初始化密码
         readFlash(RECODE_PW, pw, &len);
-        if (strlen(pw) != 16)
+        if (strlen((const char *)pw) != 16)
         {
             memcpy(pw, DEFAULT_PW, 16);
         }
         LOG_I("pw:%s", pw);
+        UpdateBattery();
         // ls_uart_init();
         // HAL_UART_Receive_IT(&UART_Server_Config, &uart_server_rx_byte, 1);
         // ls_uart_server_init();
@@ -399,18 +404,24 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
 }
 
 int main()
-{
+{	
+    //上电启动增加延时，否则开机读取电量不准
+    int i,j;
+    for(i=0;i<5000;i++)
+    {
+        for(j=0;j<1000;j++)
+        ;
+    }
     sys_init_app();
     initFlash();
     lsadc_init();
-    UpdateBattery();
-    //crypt_init();
     initMotor();
     initLed();
-    initBt();
+    initExti();
     ble_init();
     dev_manager_init(dev_manager_callback);
     gap_manager_init(gap_manager_callback);
     gatt_manager_init(gatt_manager_callback);
+    
     ble_loop();
 }

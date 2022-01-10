@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: hecai
  * @Date: 2021-09-15 12:26:42
- * @LastEditTime: 2021-12-30 22:43:05
+ * @LastEditTime: 2022-01-11 01:08:25
  * @FilePath: \ls_ble_sdk\dev\project\ble\ble_uart_server\Tools.h
  */
 #ifndef __TOOLS_H__
@@ -28,7 +28,7 @@ typedef enum
 }LED_STATE;
 
 void initLed(void);
-void initBt(void);
+void initExti(void);
 void SetLedRed(LED_STATE state);
 void SetLedBlue(LED_STATE state);
 void UpdateBattery(void);

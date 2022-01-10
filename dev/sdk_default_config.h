@@ -2,14 +2,14 @@
  * @Description: 
  * @Author: hecai
  * @Date: 2021-09-02 14:33:54
- * @LastEditTime: 2021-12-28 00:00:15
+ * @LastEditTime: 2022-01-11 00:02:59
  * @FilePath: \ls_ble_sdk\dev\sdk_default_config.h
  */
 #ifndef SDK_DEFAULT_CONFIG_H_
 #define SDK_DEFAULT_CONFIG_H_
 
 #ifndef SDK_SW_TIMER_MAX
-#define SDK_SW_TIMER_MAX 8
+#define SDK_SW_TIMER_MAX 10
 #endif
 
 #ifndef SDK_DCDC_BYPASS
