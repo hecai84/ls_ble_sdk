@@ -2,7 +2,7 @@
  * @Description:
  * @Author: hecai
  * @Date: 2021-09-16 10:44:14
- * @LastEditTime: 2022-01-25 11:34:08
+ * @LastEditTime: 2022-01-25 21:23:10
  * @FilePath: \ls_ble_sdk\dev\project\ble\ble_uart_server\Tools.c
  */
 #include "Tools.h"
@@ -285,6 +285,8 @@ void io_exti_callback(uint8_t pin)
         break;
     case CHRG:
         LOG_I("charging");
+        battery=6;
+        updateAdv();
         SetLedRed(LED_OPEN);
         if (chrg_timer == NULL)
         {
