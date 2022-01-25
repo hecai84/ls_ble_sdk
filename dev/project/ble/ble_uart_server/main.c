@@ -16,6 +16,7 @@
 #include "flash.h"
 #include "parser.h"
 #include "lscrypt.h"
+#include "main.h"
 
 #define UART_SVC_ADV_NAME "YILA"
 #define UART_SERVER_MAX_MTU 247
@@ -101,7 +102,7 @@ static struct gatt_svc_env ls_uart_server_svc_env;
 static uint8_t connect_id = 0xff;
 // static uint8_t uart_server_buf[UART_SVC_BUFFER_SIZE];
 // static uint16_t uart_server_rx_index = 0;
-static bool uart_server_ntf_done = true;
+//static bool uart_server_ntf_done = true;
 static uint16_t uart_server_mtu = UART_SERVER_MTU_DFT;
 //static struct builtin_timer *uart_server_timer_inst = NULL;
 static bool update_adv_intv_flag = false;
@@ -209,6 +210,12 @@ static void gap_manager_callback(enum gap_evt_type type, union gap_evt_u *evt, u
     }
 }
 
+void updateAdv(void)
+{
+    dev_manager_stop_adv(adv_obj_hdl);
+    update_adv_intv_flag = true;
+}
+
 static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt, uint8_t con_idx)
 {
     CMD_TYPE cmd;
@@ -299,7 +306,7 @@ static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt
         }
         break;
     case SERVER_NOTIFICATION_DONE:
-        uart_server_ntf_done = true;
+        //uart_server_ntf_done = true;
         LOG_I("ntf done");
         break;
     case MTU_CHANGED_INDICATION:

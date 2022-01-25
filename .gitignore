@@ -8,3 +8,4 @@ doc/_build/
 *.map
 pcb/fp-info-cache
 pcb/BlueLock.pro
+dev/project/ble/ble_uart_server/mdk/

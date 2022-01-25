@@ -2,7 +2,7 @@
  * @Description:
  * @Author: hecai
  * @Date: 2021-09-16 10:44:14
- * @LastEditTime: 2022-01-11 01:10:38
+ * @LastEditTime: 2022-01-25 11:34:08
  * @FilePath: \ls_ble_sdk\dev\project\ble\ble_uart_server\Tools.c
  */
 #include "Tools.h"
@@ -37,6 +37,7 @@ volatile uint8_t recv_flag = 1;
 ADC_HandleTypeDef hadc;
 u8 battery = 5;
 u8 redState = 1;
+#include "main.h"
 
 void Error_Handler(void);
 
@@ -123,6 +124,8 @@ void chrgcheck(void *param)
     else
     {
         LOG_I("charge out");
+        UpdateBattery();
+        updateAdv();
         SetLedRed(LED_CLOSE);
     }
 }
@@ -148,8 +151,11 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *h)
     // 3300/4095*2
     value = HAL_ADC_GetValue(h) * 1.612;
     LOG_I("battery:%d", value);
-    if (value < 3200)
+    if (value < 3340)
+    {
+        LOG_I("twink red");
         SetLedRed(LED_TWINK);
+    }
     else if (io_read_pin(CHRG) != 0)
     {
         SetLedRed(LED_CLOSE);
