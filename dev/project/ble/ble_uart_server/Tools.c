@@ -2,7 +2,7 @@
  * @Description:
  * @Author: hecai
  * @Date: 2021-09-16 10:44:14
- * @LastEditTime: 2022-01-25 21:23:10
+ * @LastEditTime: 2022-02-15 10:07:40
  * @FilePath: \ls_ble_sdk\dev\project\ble\ble_uart_server\Tools.c
  */
 #include "Tools.h"
@@ -142,16 +142,16 @@ void lsadc_init(void)
 
     hadc.Init.ContinuousConvMode = ENABLE;           /* Continuous mode to have maximum conversion speed (no delay between conversions) */
     hadc.Init.TrigType = ADC_REGULAR_SOFTWARE_TRIGT; /* Trig of conversion start done by which event */
-    hadc.Init.Vref = ADC_VREF_VCC;
+    hadc.Init.Vref = ADC_VREF_INSIDE;
 }
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *h)
 {
     u16 value;
-    // 3300/4095*2
-    value = HAL_ADC_GetValue(h) * 1.612;
+    // 1400/4095*6
+    value = HAL_ADC_GetValue(h) * 2.051;
     LOG_I("battery:%d", value);
-    if (value < 3340)
+    if (value < 3200)
     {
         LOG_I("twink red");
         SetLedRed(LED_TWINK);
