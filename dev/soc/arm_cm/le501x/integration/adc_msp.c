@@ -34,6 +34,8 @@ void HAL_ADC_MSP_Init(ADC_HandleTypeDef *inst)
 
 void HAL_ADC_MSP_DeInit(ADC_HandleTypeDef *inst)
 {
+    REG_FIELD_WR(RCC->APB2RST, RCC_ADC, 1);
+    REG_FIELD_WR(RCC->APB2RST, RCC_ADC, 0);
     REG_FIELD_WR(RCC->APB2EN, RCC_ADC, 0);
     NVIC_DisableIRQ(ADC_IRQn);
 }
