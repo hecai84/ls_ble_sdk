@@ -144,7 +144,7 @@ static void lvd33_irq_enable()
 void irq_reinit()
 {
     irq_priority();
-    NVIC->ISER[0] = 1<<LPWKUP_IRQn|1<<EXTI_IRQn;
+    NVIC->ISER[0] = 1<<LPWKUP_IRQn|1<<EXTI_IRQn|1<<RTC_IRQn;
     lvd33_irq_enable();
 }
 
@@ -199,7 +199,12 @@ void rco_calibration_start()
 
 static uint16_t lsi_cnt_val;
 static uint16_t lsi_dummy_cnt;
-#define LSI_CNT_CYCLES (100)
+
+uint16_t get_lsi_cnt_val(void)
+{
+    return lsi_cnt_val;
+}
+
 static void GPTIM_IRQ_Handler_For_LSI_Counting()
 {
     LSGPTIMB->ICR = TIMER_ICR_UIE_MASK;         // Clear interrupt

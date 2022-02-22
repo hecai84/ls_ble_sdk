@@ -39,4 +39,6 @@ static inline int32_t time_diff(uint32_t time0,uint32_t time1)
 uint8_t count_trailing_zeros(uint32_t x);
 
 uint8_t count_leading_zeros(uint32_t x);
+
+uint32_t __div64_32(uint64_t *n, uint32_t base);
 #endif

@@ -49,6 +49,13 @@ enum RTC_CLK_SEL
     RTC_CKSEL_LSI,
     // RTC_CKSEL_PLL,
 };
+/**
+ ****************************************************************************************
+ * \brief RTC IRQ handler
+ *
+ ****************************************************************************************
+ */
+void HAL_RTC_IRQHandler(void);
 
 /**
  ****************************************************************************************
@@ -92,11 +99,20 @@ HAL_StatusTypeDef RTC_CalendarGet(calendar_cal_t *calendar_cal, calendar_time_t 
  ****************************************************************************************
  * \brief RTC wakeup time set function
  *
- * \param[in]  second         wakeup time(the unit is second)
+ * \param[in]  t_ms         wakeup time(the unit is millisecond). The accuracy depends on 
+ * the real RC clock.
  *
  ****************************************************************************************
  */
-void RTC_wkuptime_set(uint32_t second);
+void RTC_wkuptime_set(uint32_t t_ms);
+
+/**
+ ****************************************************************************************
+ * \brief Clear RTC wakeuptime configuration
+ *
+ ****************************************************************************************
+ */
+void RTC_wkuptime_clr(void);
 
 /**
  ****************************************************************************************

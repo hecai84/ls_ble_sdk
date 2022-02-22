@@ -9,6 +9,8 @@
 #define RESET_OTA_FAILED       0xBDBDBDBD
 #define RESET_OTA_REQ          0xDDDDDDDD
 
+#define LSI_CNT_CYCLES (100)
+
 enum OTA_settings_type
 {
     SINGLE_FOREGROUND = 0,
@@ -82,6 +84,9 @@ uint32_t config_word_get(uint32_t offset);
 
 void arm_cm_set_int_isr(uint8_t type,void (*isr)());
 
+#if SDK_LSI_USED
+uint16_t get_lsi_cnt_val(void);
+#endif
 
 #define DELAY_US(a) arm_cm_delay_asm((a)*SDK_HCLK_MHZ/5)
 
