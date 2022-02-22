@@ -4,7 +4,7 @@
 #include "sleep.h"
 #include "io_config.h"
 
-#define WAKEUP_SECOND 5
+#define WAKEUP_MS 5000
 
 static void at_gap_name_handler(uint8_t *p_cmd_parse);
 static void at_bd_addr_handler(uint8_t *p_cmd_parse);
@@ -419,7 +419,7 @@ static void at_sleep_handler(uint8_t *p_cmd_parse)
             }
             else if(sleep_mode_set==1){
                 HAL_RTC_Init(RTC_CKSEL_LSI);
-                RTC_wkuptime_set(WAKEUP_SECOND);
+                RTC_wkuptime_set(WAKEUP_MS);
                 memset(&wkup,0,sizeof(wkup));
 
                 wkup.rtc = 1;
