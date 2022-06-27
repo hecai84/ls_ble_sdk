@@ -130,8 +130,5 @@ static uint16_t Buffercmp(uint8_t* pBuff1, uint8_t* pBuff2, uint16_t Length)
   */
 static void Error_Handler(void)
 {
-  while (1)
-  {
-		;
-  }
+    ;
 }

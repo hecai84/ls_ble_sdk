@@ -387,11 +387,6 @@
               <FilePath>..\main.c</FilePath>
             </File>
             <File>
-              <FileName>Motor.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Motor.c</FilePath>
-            </File>
-            <File>
               <FileName>Tools.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Tools.c</FilePath>
@@ -405,6 +400,16 @@
               <FileName>parser.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\parser.c</FilePath>
+            </File>
+            <File>
+              <FileName>bat.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\bat.c</FilePath>
+            </File>
+            <File>
+              <FileName>md5.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\md5.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -1,6 +1,7 @@
 {
     "C_Cpp.errorSquiggles": "Disabled",
     "files.associations": {
+        "*.H": "cpp",
         "ls_ble.h": "c",
         "linked_buffer.h": "c",
         "co_list.h": "c",
@@ -65,7 +66,10 @@
         "at_cmd_parse.h": "c",
         "segger_rtt.h": "c",
         "flash.h": "c",
-        "type_traits": "c"
+        "type_traits": "c",
+        "bat.h": "c",
+        "lsadc.h": "c",
+        "md5.h": "c"
     },
     "editor.detectIndentation": false,
     "restructuredtext.confPath": "${workspaceFolder}\\doc",

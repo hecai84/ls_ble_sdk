@@ -10,6 +10,7 @@
 
 typedef enum{
     RECODE_PW=1,
+    RECODE_SALE,
     RECODE_OTHER
 }RECODE_NAME;
 

@@ -10,7 +10,7 @@
 #include "co_math.h"
 #include "io_config.h"
 #include "SEGGER_RTT.h"
-#include "Motor.h"
+#include "bat.h"
 #include "lsrtc.h"
 #include "sleep.h"
 #include "flash.h"
@@ -18,7 +18,7 @@
 #include "lscrypt.h"
 #include "main.h"
 
-#define UART_SVC_ADV_NAME "YILA"
+#define UART_SVC_ADV_NAME "WST-BAT"
 #define UART_SERVER_MAX_MTU 247
 #define UART_SERVER_MTU_DFT 23
 #define UART_SERVER_MAX_DATA_LEN (uart_server_mtu - 3)
@@ -102,9 +102,9 @@ static struct gatt_svc_env ls_uart_server_svc_env;
 static uint8_t connect_id = 0xff;
 // static uint8_t uart_server_buf[UART_SVC_BUFFER_SIZE];
 // static uint16_t uart_server_rx_index = 0;
-//static bool uart_server_ntf_done = true;
+// static bool uart_server_ntf_done = true;
 static uint16_t uart_server_mtu = UART_SERVER_MTU_DFT;
-//static struct builtin_timer *uart_server_timer_inst = NULL;
+// static struct builtin_timer *uart_server_timer_inst = NULL;
 static bool update_adv_intv_flag = false;
 static uint16_t cccd_config = 0;
 
@@ -135,24 +135,24 @@ static void ls_uart_server_data_length_update(uint8_t con_idx);
 //     update_adv_intv_flag = true;
 // }
 
-//static void ls_uart_server_timer_cb(void *param)
+// static void ls_uart_server_timer_cb(void *param)
 //{
-//    u16 handle;
-//    if (isWorking == false)
-//    {
-//        // handle = gatt_manager_get_svc_att_handle(&ls_uart_server_svc_env, UART_SVC_IDX_TX_VAL);
-//        if (uart_server_timer_inst)
-//        {
-//            builtin_timer_stop(uart_server_timer_inst);
-//            builtin_timer_delete(uart_server_timer_inst);
-//        }
-//        // gatt_manager_server_send_notification(connect_id, handle, "OK", strlen("OK"), NULL);
-//    }
-//    if (uart_server_timer_inst)
-//    {
-//        builtin_timer_start(uart_server_timer_inst, UART_SERVER_TIMEOUT, NULL);
-//    }
-//}
+//     u16 handle;
+//     if (isWorking == false)
+//     {
+//         // handle = gatt_manager_get_svc_att_handle(&ls_uart_server_svc_env, UART_SVC_IDX_TX_VAL);
+//         if (uart_server_timer_inst)
+//         {
+//             builtin_timer_stop(uart_server_timer_inst);
+//             builtin_timer_delete(uart_server_timer_inst);
+//         }
+//         // gatt_manager_server_send_notification(connect_id, handle, "OK", strlen("OK"), NULL);
+//     }
+//     if (uart_server_timer_inst)
+//     {
+//         builtin_timer_start(uart_server_timer_inst, UART_SERVER_TIMEOUT, NULL);
+//     }
+// }
 
 static void ls_uart_server_read_req_ind(uint8_t att_idx, uint8_t con_idx)
 {
@@ -187,14 +187,12 @@ static void gap_manager_callback(enum gap_evt_type type, union gap_evt_u *evt, u
     {
     case CONNECTED:
         connect_id = con_idx;
-        SetLedBlue(LED_OPEN);
         UpdateBattery();
         LOG_I("connected!");
         break;
     case DISCONNECTED:
         connect_id = 0xff;
         uart_server_mtu = UART_SERVER_MTU_DFT;
-        SetLedBlue(LED_CLOSE);
         LOG_I("disconnected!");
         start_adv();
         break;
@@ -220,9 +218,8 @@ static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt
 {
     CMD_TYPE cmd;
     uint16_t handle;
-    u8 para[20] = {0};
-    u8 *pos;
-    int procTime, waitTime;
+    char para[20] = {0};
+    int procTime;
     switch (type)
     {
     case SERVER_READ_REQ:
@@ -234,30 +231,17 @@ static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt
         handle = gatt_manager_get_svc_att_handle(&ls_uart_server_svc_env, UART_SVC_IDX_TX_VAL);
         if (evt->server_write_req.att_idx == UART_SVC_IDX_TX_NTF_CFG)
             break;
-
+        //解析指令
         cmd = ParseCmd(evt->server_write_req.value, evt->server_write_req.length, para);
         if (cmd == CMD_OPEN)
         {
-            LOG_I("start open %s", para);
-            pos = (u8 *)strstr((const char *)para, ",");
-            if (pos != NULL)
+            LOG_I("start open:%s", para);
+            procTime = atoi(para);
+            //时间范围  1分钟 ~ 1周
+            if (procTime >= 1 && procTime <= 10080)
             {
-                procTime = atoi((const char *)(para + 1));
-                waitTime = atoi((const char *)(pos + 1));
-                if (para[0] == '+')
-                {
-                    openDoor(procTime, waitTime); //
-                    gatt_manager_server_send_notification(connect_id, handle, "OK", strlen("OK"), NULL);
-                }
-                else if (para[0] == '-')
-                {
-                    openDoor(-procTime, waitTime); //
-                    gatt_manager_server_send_notification(connect_id, handle, "OK", strlen("OK"), NULL);
-                }
-                else
-                {
-                    gatt_manager_server_send_notification(connect_id, handle, "ERROR", strlen("ERROR"), NULL);
-                }
+                DisCharge(procTime);
+                gatt_manager_server_send_notification(connect_id, handle, "OK", strlen("OK"), NULL);
             }
             else
             {
@@ -267,38 +251,17 @@ static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt
             // uart_server_timer_inst = builtin_timer_create(ls_uart_server_timer_cb);
             // builtin_timer_start(uart_server_timer_inst, UART_SERVER_TIMEOUT, NULL);
         }
-        else if (cmd == CMD_PW)
+        else if (cmd == CMD_CLOSE)
         {
-            if (strlen((const char *)para) == 16)
-            {
-                LOG_I("new pw:%s", para);
-                if (strcmp((const char *)para, (const char *)pw) != 0)
-                {
-                    memcpy(pw, para, 16);
-                    writeFlash(RECODE_PW, pw, 16);
-                }
-                gatt_manager_server_send_notification(connect_id, handle, "OK", strlen("OK"), NULL);
-            }
-            else
-            {
-                gatt_manager_server_send_notification(connect_id, handle, "ERROR", strlen("ERROR"), NULL);
-            }
+            LOG_I("close battery");
+            CloseBattery();
+            gatt_manager_server_send_notification(connect_id, handle, "OK", strlen("OK"), NULL);
         }
-        else if (cmd == CMD_BUSY)
+        else if (cmd == CMD_SALE)
         {
-            gatt_manager_server_send_notification(connect_id, handle, "ERROR", strlen("ERROR"), NULL);
-        }
-        else if (cmd == CMD_OVERTIME)
-        {
-            gatt_manager_server_send_notification(connect_id, handle, "ERROR", strlen("ERROR"), NULL);
-        }
-        else if (cmd == CMD_PWERROR)
-        {
-            gatt_manager_server_send_notification(connect_id, handle, "ERROR", strlen("ERROR"), NULL);
-        }
-        else if (cmd == CMD_UNDEFINE)
-        {
-            gatt_manager_server_send_notification(connect_id, handle, "ERROR", strlen("ERROR"), NULL);
+            LOG_I("sale battery");
+            SaleBattery();
+            gatt_manager_server_send_notification(connect_id, handle, "OK", strlen("OK"), NULL);
         }
         else
         {
@@ -306,7 +269,7 @@ static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt
         }
         break;
     case SERVER_NOTIFICATION_DONE:
-        //uart_server_ntf_done = true;
+        // uart_server_ntf_done = true;
         LOG_I("ntf done");
         break;
     case MTU_CHANGED_INDICATION:
@@ -367,17 +330,23 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
     case STACK_READY:
     {
         bool type;
+        u8 sale;
         uint16_t len = 16;
         dev_manager_get_identity_bdaddr(dev_addr + 2, &type);
         LOG_I("type:%d,addr:", type);
         LOG_HEX(dev_addr + 2, sizeof(dev_addr) - 3);
         dev_manager_add_service((struct svc_decl *)&ls_uart_server_svc);
-        //初始化密码
-        readFlash(RECODE_PW, pw, &len);
-        if (strlen((const char *)pw) != 16)
+        //初始化售卖状态
+        readFlash(RECODE_SALE, &sale, &len);
+        if (len != 1 && sale)
         {
-            memcpy(pw, DEFAULT_PW, 16);
+            LOG_I("device saled");
         }
+        else
+        {
+            LOG_I("device not saled");
+        }
+        sprintf((char *)pw, "%02x%02x%02x%02x%02x%02x", dev_addr[2], dev_addr[3], dev_addr[4], dev_addr[5], dev_addr[6], dev_addr[7]);
         LOG_I("pw:%s", pw);
         UpdateBattery();
         // ls_uart_init();
@@ -411,24 +380,21 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
 }
 
 int main()
-{	
+{
     //上电启动增加延时，否则开机读取电量不准
-    int i,j;
-    for(i=0;i<5000;i++)
+    int i, j;
+    for (i = 0; i < 5000; i++)
     {
-        for(j=0;j<1000;j++)
-        ;
+        for (j = 0; j < 1000; j++)
+            ;
     }
     sys_init_app();
     initFlash();
-    lsadc_init();
-    initMotor();
-    initLed();
-    initExti();
+    initBattery();
     ble_init();
     dev_manager_init(dev_manager_callback);
     gap_manager_init(gap_manager_callback);
     gatt_manager_init(gatt_manager_callback);
-    
+
     ble_loop();
 }

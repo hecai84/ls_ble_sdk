@@ -2,8 +2,8 @@
  * @Description: 
  * @Author: hecai
  * @Date: 2021-09-15 12:26:42
- * @LastEditTime: 2022-01-11 01:08:25
- * @FilePath: \ls_ble_sdk\dev\project\ble\ble_uart_server\Tools.h
+ * @LastEditTime: 2022-06-23 00:32:02
+ * @FilePath: \battery\dev\project\ble\ble_uart_server\Tools.h
  */
 #ifndef __TOOLS_H__
 #define __TOOLS_H__
@@ -27,12 +27,6 @@ typedef enum
     LED_TWINK,
 }LED_STATE;
 
-void initLed(void);
-void initExti(void);
-void SetLedRed(LED_STATE state);
-void SetLedBlue(LED_STATE state);
-void UpdateBattery(void);
-void lsadc_init(void);
 
 
 #endif
