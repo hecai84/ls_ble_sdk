@@ -2,7 +2,7 @@
  * @Description:
  * @Author: hecai
  * @Date: 2021-11-02 10:00:47
- * @LastEditTime: 2022-06-27 21:25:04
+ * @LastEditTime: 2022-07-07 02:19:09
  * @FilePath: \battery\dev\project\ble\ble_uart_server\parser.c
  */
 #include "parser.h"
@@ -118,14 +118,12 @@ void SetSysState(SYS_STATE state)
 bool checkMd5()
 {
     u8 read_len;
-    char md5[8];
     char md5str[8];
     char src[80];
     unsigned char decrypt[16] = {0};
 
-    memcpy(md5, buff, 8);
     memcpy(src, aes_key, 16);
-    memcpy(src + 16, buff, 64);
+    memcpy(src + 16, buff+8, strlen((char *)buff));
 
     MD5Init(&md5c); //初始化
     read_len = strlen(src);
@@ -134,11 +132,17 @@ bool checkMd5()
     MD5Final(&md5c, decrypt);
 
     sprintf(md5str, "%02X%02X%02X%02X", decrypt[0],decrypt[1],decrypt[2],decrypt[3]);
-    
-    if(strcmp(md5,md5str)==0)
+    LOG_I("Md5 check:%s\0",md5str);
+    if(memcmp(buff,md5str,8)==0)
+    {
+        LOG_I("check success");
 	    return true;
+    }
     else
+    {
+        LOG_I("check error");
         return false;
+    }
 }
 
 /**
@@ -156,9 +160,10 @@ CMD_TYPE ParseCmd(const u8 *dat, u8 len, char *para)
 {
     char *posBegin;
     char *posEnd;
-    char tempPw[12] = {0};
     char curTime[10] = {0};
     char action[10] = {0};
+    
+    LOG_I("CMD Len:%d",len);
     if (len < 20 || len % 16 > 0 || len > 64)
     {
         LOG_I("CMD_ERROR");
@@ -173,7 +178,7 @@ CMD_TYPE ParseCmd(const u8 *dat, u8 len, char *para)
     LOG_I("decodeInfo");
     decodeInfo(dat, len);
     LOG_I("cmd:%s\0", buff);
-    memcpy(curTime, buff, 10);
+    memcpy(curTime, buff+8, 10);
     //对比时间
     LOG_I("curTime:%s", curTime);
     LOG_I("lastTime:%s", lastTime);
@@ -184,22 +189,22 @@ CMD_TYPE ParseCmd(const u8 *dat, u8 len, char *para)
         LOG_I("CMD_ERRORSIGN");
         return CMD_ERRORSIGN;        
     }
+    LOG_I("CMD_SIGN_OK");
     //检查时间戳
-    if (strcmp((const char *)curTime,"1478916000")!=0 && strcmp((const char *)curTime, (const char *)lastTime) <= 0)
+    if (strcmp((const char *)curTime, (const char *)lastTime) <= 0)
     {
         LOG_I("CMD_OVERTIME");
         return CMD_OVERTIME;
     }else
         memcpy(lastTime, curTime, 10);
-
+    LOG_I("CMD_TIME_OK");
     //比对密码,密码为设备地址
-    memcpy(tempPw, buff + 10, 12);
-    if (strcmp((const char *)tempPw, (const char *)pw) != 0)
+    if (memcmp(buff+18,pw,12) != 0)
     {
         LOG_I("CMD_PWERROR");
         return CMD_PWERROR;
     }
-
+    LOG_I("CMD_PW_OK");
     //获取action
     posBegin = strstr((const char *)buff, "A:");
     if (posBegin != NULL)
@@ -220,6 +225,7 @@ CMD_TYPE ParseCmd(const u8 *dat, u8 len, char *para)
         LOG_I("CMD_ERROR A");
         return CMD_ERROR;
     }
+    LOG_I("CMD_OK");
     //获取para,参数可以为空
     posBegin = strstr((const char *)buff, "P:");
     if (posBegin != NULL)

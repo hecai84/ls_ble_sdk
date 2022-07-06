@@ -39,7 +39,7 @@ extern uint8_t ciphertext_buff[];
 extern uint8_t plaintext_buff[];
 extern u8 pw[];
 extern u8 battery;
-extern bool isWorking;
+extern u8 saled;
 
 enum uart_svc_att_db_handles
 {
@@ -255,12 +255,19 @@ static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt
         {
             LOG_I("close battery");
             CloseBattery();
+            //如果已经售出,取消售出状态
+            if(saled)
+            {
+                saled = false;
+                writeFlash(RECODE_SALE, &saled, 1);
+            }
             gatt_manager_server_send_notification(connect_id, handle, "OK", strlen("OK"), NULL);
         }
         else if (cmd == CMD_SALE)
         {
             LOG_I("sale battery");
             SaleBattery();
+            writeFlash(RECODE_SALE, &saled, 1);
             gatt_manager_server_send_notification(connect_id, handle, "OK", strlen("OK"), NULL);
         }
         else
@@ -286,8 +293,8 @@ static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt
 static void create_adv_obj()
 {
     struct legacy_adv_obj_param adv_param = {
-        .adv_intv_min = 1500,
-        .adv_intv_max = 1500,
+        .adv_intv_min = 800,
+        .adv_intv_max = 800,
         .own_addr_type = PUBLIC_OR_RANDOM_STATIC_ADDR,
         .filter_policy = 0,
         .ch_map = 0x7,
@@ -330,23 +337,23 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
     case STACK_READY:
     {
         bool type;
-        u8 sale;
         uint16_t len = 16;
         dev_manager_get_identity_bdaddr(dev_addr + 2, &type);
         LOG_I("type:%d,addr:", type);
         LOG_HEX(dev_addr + 2, sizeof(dev_addr) - 3);
         dev_manager_add_service((struct svc_decl *)&ls_uart_server_svc);
         //初始化售卖状态
-        readFlash(RECODE_SALE, &sale, &len);
-        if (len != 1 && sale)
+        readFlash(RECODE_SALE, &saled, &len);
+        if (len != 1 && saled)
         {
             LOG_I("device saled");
+            DisCharge(-1);
         }
         else
         {
             LOG_I("device not saled");
         }
-        sprintf((char *)pw, "%02x%02x%02x%02x%02x%02x", dev_addr[2], dev_addr[3], dev_addr[4], dev_addr[5], dev_addr[6], dev_addr[7]);
+        sprintf((char *)pw, "%02X%02X%02X%02X%02X%02X", dev_addr[7], dev_addr[6], dev_addr[5], dev_addr[4], dev_addr[3], dev_addr[2]);
         LOG_I("pw:%s", pw);
         UpdateBattery();
         // ls_uart_init();

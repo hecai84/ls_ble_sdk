@@ -2,7 +2,7 @@
  * @Description:
  * @Author: hecai
  * @Date: 2021-09-14 15:27:57
- * @LastEditTime: 2022-06-27 21:38:05
+ * @LastEditTime: 2022-06-29 21:16:07
  * @FilePath: \battery\dev\project\ble\ble_uart_server\bat.c
  */
 #include "bat.h"
@@ -14,8 +14,9 @@ ADC_HandleTypeDef hadc;
 // 0x55+ack+0xaa+ack+电量+ack+stop
 /* I2C handler declaration */
 static struct builtin_timer *bat_timer_inst_stop = NULL;
-bool isWorking = false;
+
 u8 battery = 50;
+u8 saled = false;
 /**
  * @brief  This function is executed in case of error occurrence.
  * @retval None
@@ -27,7 +28,6 @@ void Error_Handler(void)
 
     /* USER CODE END Error_Handler_Debug */
 }
-
 
 void lsadc_init(void)
 {
@@ -52,32 +52,38 @@ void initBattery(void)
 
 void UpdateBattery(void)
 {
-    if (HAL_ADC_Init(&hadc) != HAL_OK)
+    //如果已经售卖了电量显示0xff
+    if (saled)
+        battery = 0xff;
+    else
     {
-        LOG_I("HAL_ADC_Init error");
-        Error_Handler();
-    }
+        if (HAL_ADC_Init(&hadc) != HAL_OK)
+        {
+            LOG_I("HAL_ADC_Init error");
+            Error_Handler();
+        }
 
-    ADC_ChannelConfTypeDef sConfig = {0};
-    /**
-     * Configure Regular Channel
-     */
-    sConfig.Channel = ADC_CHANNEL_5;
-    sConfig.Rank = ADC_REGULAR_RANK_1;
-    sConfig.SamplingTime = 0x00000002U;
-    if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK)
-    {
-        Error_Handler();
-    }
-    adc12b_in5_io_init();
-    LOG_I("HAL_ADC_Start_IT");
-    HAL_ADC_Start_IT(&hadc);
+        ADC_ChannelConfTypeDef sConfig = {0};
+        /**
+         * Configure Regular Channel
+         */
+        sConfig.Channel = ADC_CHANNEL_5;
+        sConfig.Rank = ADC_REGULAR_RANK_1;
+        sConfig.SamplingTime = 0x00000002U;
+        if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK)
+        {
+            Error_Handler();
+        }
+        adc12b_in5_io_init();
+        LOG_I("HAL_ADC_Start_IT");
+        HAL_ADC_Start_IT(&hadc);
 
-    // if (recv_flag == 1)
-    // {
-    //     recv_flag = 0;
-    //     HAL_ADC_Start_IT(&hadc);
-    // }
+        // if (recv_flag == 1)
+        // {
+        //     recv_flag = 0;
+        //     HAL_ADC_Start_IT(&hadc);
+        // }
+    }
 }
 
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *h)
@@ -119,16 +125,14 @@ void StopBattery(void *param)
 {
     LOG_I("StopBattery");
     io_write_pin(BAT_EN, 0);
-    isWorking = false;
     UpdateBattery();
-
 }
-
 
 void CloseBattery(void)
 {
     LOG_I("CloseBattery");
     StopBattery(NULL);
+    UpdateBattery();
 }
 /**
  * @description: 销售电池
@@ -138,29 +142,33 @@ void SaleBattery(void)
 {
     LOG_I("SaleBattery");
     io_write_pin(BAT_EN, 1);
-    isWorking = true;
+    saled = true;
+    //关闭定时器
+    if (bat_timer_inst_stop != NULL)
+        builtin_timer_stop(bat_timer_inst_stop);
     UpdateBattery();
 }
+/**
+ * @description:
+ * @param {int} procTime  打开的时间,如果为-1则不主动关闭
+ * @return {*}
+ */
 void DisCharge(int procTime)
 {
     LOG_I("procTime:%d ", procTime);
 
-    if (isWorking)
-        return;
-    isWorking = true;
-    if (bat_timer_inst_stop == NULL)
-        bat_timer_inst_stop = builtin_timer_create(StopBattery);
-
     LOG_I("DisCharge");
     io_write_pin(BAT_EN, 1);
-    //定时关闭
-    builtin_timer_stop(bat_timer_inst_stop);
-    builtin_timer_start(bat_timer_inst_stop, procTime*60000, NULL);
 
-    //    adc_timer_inst=builtin_timer_create(checkCurrent);
-    //    recv_flag=0;
-    //    HAL_ADC_Start_IT(&hadc);
-    //    builtin_timer_start(adc_timer_inst, CHECK_TIME, NULL);
+    if (procTime != -1)
+    {
+        if (bat_timer_inst_stop == NULL)
+            bat_timer_inst_stop = builtin_timer_create(StopBattery);
+
+        //定时关闭
+        builtin_timer_stop(bat_timer_inst_stop);
+        builtin_timer_start(bat_timer_inst_stop, procTime * 60000, NULL);
+    }
 
     return;
 }
