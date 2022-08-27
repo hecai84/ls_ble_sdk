@@ -222,7 +222,7 @@ static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt
     uint16_t handle;
     u8 para[20] = {0};
     u8 *pos;
-    int procTime, waitTime;
+    int procTime, waitTime,returnTime;
     switch (type)
     {
     case SERVER_READ_REQ:
@@ -243,15 +243,29 @@ static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt
             if (pos != NULL)
             {
                 procTime = atoi((const char *)(para + 1));
-                waitTime = atoi((const char *)(pos + 1));
+                if(procTime>5000)
+                    procTime = 5000;
+                waitTime = atoi((const char *)(pos + 1));  
+                if(waitTime>5000)
+                    waitTime = 5000;
+                pos = (u8 *)strstr((const char *)(pos + 1), ",");
+                if(pos != NULL)
+                    returnTime = atoi((const char *)(pos + 1));
+                else
+                    returnTime = procTime;
+                
+                if(returnTime>5000)
+                    returnTime = 5000;
+                
+
                 if (para[0] == '+')
                 {
-                    openDoor(procTime, waitTime); //
+                    openDoor(procTime, waitTime,returnTime); //
                     gatt_manager_server_send_notification(connect_id, handle, "OK", strlen("OK"), NULL);
                 }
                 else if (para[0] == '-')
                 {
-                    openDoor(-procTime, waitTime); //
+                    openDoor(-procTime, waitTime,returnTime); //
                     gatt_manager_server_send_notification(connect_id, handle, "OK", strlen("OK"), NULL);
                 }
                 else

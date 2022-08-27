@@ -2,7 +2,7 @@
   FileVersion = 2
 [GENERAL]
   ConnectMode = 0
-  CurrentFile = "D:\WorkSpace\BLE\ls_ble_sdk\production\ble_uart_server_production_v11.hex"
+  CurrentFile = "D:\WorkSpace\BLE\ls_ble_sdk\production\ble_uart_server_production_v12.hex"
   DataFileSAddr = 0x00000000
   GUIMode = 0
   HostName = ""

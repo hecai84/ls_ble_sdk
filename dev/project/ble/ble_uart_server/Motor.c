@@ -2,7 +2,7 @@
  * @Description:
  * @Author: hecai
  * @Date: 2021-09-14 15:27:57
- * @LastEditTime: 2022-02-15 10:11:58
+ * @LastEditTime: 2022-08-14 22:03:46
  * @FilePath: \ls_ble_sdk\dev\project\ble\ble_uart_server\Motor.c
  */
 #include "Motor.h"
@@ -19,8 +19,8 @@ static struct builtin_timer *motor_timer_inst_close = NULL;
 static struct builtin_timer *motor_timer_inst_finish = NULL;
 static bool foward = true;
 bool isWorking = false;
-u16 processTime=0;
-
+u16 processTime = 0;
+u16 returnTime = 0;
 
 void initMotor(void)
 {
@@ -53,19 +53,20 @@ void closeDoor(void *param)
     
     //定时关闭
     builtin_timer_stop(motor_timer_inst_stop);
-    builtin_timer_start(motor_timer_inst_stop, processTime, NULL);
+    builtin_timer_start(motor_timer_inst_stop, returnTime, NULL);
     return;
 }
 
 void powFinish(void *param)
 {
     isWorking = false;
+    stopMotor(NULL);
     UpdateBattery();
 }
 
-void openDoor(int procTime,int waitTime)
+void openDoor(int procTime,int waitTime,int reTime)
 {
-    LOG_I("procTime:%d waitTime:%d",procTime,waitTime);
+    LOG_I("procTime:%d waitTime:%d",procTime,waitTime,reTime);
     if (procTime > 0)
     {
         foward = true;
@@ -76,6 +77,7 @@ void openDoor(int procTime,int waitTime)
         foward = false;
         processTime = -procTime;
     }
+    returnTime = reTime;
     if(isWorking)
         return;
     isWorking = true;
