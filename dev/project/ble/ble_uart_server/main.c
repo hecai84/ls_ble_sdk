@@ -337,8 +337,8 @@ static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt
 static void create_adv_obj()
 {
     struct legacy_adv_obj_param adv_param = {
-        .adv_intv_min = 1500,
-        .adv_intv_max = 1500,
+        .adv_intv_min = 1000,
+        .adv_intv_max = 1000,
         .own_addr_type = PUBLIC_OR_RANDOM_STATIC_ADDR,
         .filter_policy = 0,
         .ch_map = 0x7,

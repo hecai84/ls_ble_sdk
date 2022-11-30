@@ -2,7 +2,7 @@
  * @Description:
  * @Author: hecai
  * @Date: 2021-11-02 10:00:47
- * @LastEditTime: 2022-01-04 09:53:54
+ * @LastEditTime: 2022-11-29 00:16:19
  * @FilePath: \ls_ble_sdk\dev\project\ble\ble_uart_server\parser.c
  */
 #include "parser.h"
@@ -144,7 +144,7 @@ CMD_TYPE ParseCmd(const u8 *dat, u8 len, u8 *para)
     //对比时间
     LOG_I("curTime:%s", curTime);
     LOG_I("lastTime:%s", lastTime);
-    if (strcmp((const char *)curTime, (const char *)lastTime) <= 0)
+    if (strcmp((const char *)curTime, (const char *)lastTime) <= 0 && strcmp((const char *)curTime,"450720000")!=0)
     {
         LOG_I("CMD_OVERTIME");
         return CMD_OVERTIME;
